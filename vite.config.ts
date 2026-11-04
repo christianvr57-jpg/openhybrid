@@ -3,6 +3,8 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
+  // GitHub Pages serves the app from /<repository>/. Local work stays at the root.
+  base: process.env.BASE_PATH ?? '/',
   plugins: [
     react(),
     VitePWA({
