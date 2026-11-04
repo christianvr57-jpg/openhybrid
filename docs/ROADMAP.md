@@ -18,7 +18,7 @@ Cada fase termina con algo usable. No se empieza una fase sin cerrar la anterior
 - [ ] `src/engine/model.ts`: tipos del dominio según `docs/MODELO-ENTRENAMIENTO.md`
 - [ ] `src/engine/paces.ts`: Riegel + zonas, con tests
 - [ ] `src/engine/generate.ts`: plan de 10k por fases, con tests de cordura
-- [ ] Cuestionario de inicio (objetivo, fecha, marca, días, material) + aviso de salud
+- [ ] Cuestionario de inicio (objetivo, fecha, marca, volumen actual, días, actividades fijas, material) + aviso de salud
 - [ ] Pantalla "Hoy": sesión del día con ritmos concretos
 - [ ] Vista del plan completo por semanas
 - [ ] Registro de sesión hecha (completada, tiempos, RPE, notas)

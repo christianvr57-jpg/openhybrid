@@ -5,12 +5,13 @@ Este documento define el dominio antes de escribir código. Es un **borrador par
 ## 1. Entidades
 
 ```
-Athlete      Datos del usuario: nivel, marca de referencia, días disponibles, material.
+Athlete      Datos del usuario: nivel, marca de referencia, volumen semanal actual de carrera, días disponibles, actividades fijas, material.
+FixedActivity  Otro deporte con día fijo (p. ej. pádel): nombre y día de la semana. Cuenta como día duro.
 Goal         Carrera objetivo: tipo (5k | 10k | 21k | hyrox), fecha, categoría HYROX si aplica, tiempo objetivo opcional.
 Plan         Resultado del generador: lista de semanas desde hoy hasta la carrera.
 Phase        Base | Construcción | Específica | Puesta a punto (taper).
 Week         Número, fase, si es de descarga, volumen objetivo, sesiones.
-Session      Un entreno de un día: tipo, bloques, duración estimada, intensidad.
+Session      Un entreno: tipo, bloques, duración estimada, intensidad. Un día puede tener varias sesiones (p. ej. fuerza y carrera).
 Block        Unidad mínima: calentamiento, serie, estación, fuerza, vuelta a la calma.
 Station      Estación HYROX (ver sección 4).
 LoggedSession  Lo que el usuario hizo de verdad: fecha, bloques completados, tiempos, RPE, notas.
@@ -28,6 +29,8 @@ LoggedSession  Lo que el usuario hizo de verdad: fecha, bloques completados, tie
 | `stations` | Trabajo técnico/específico de estaciones HYROX |
 | `compromised_run` | Carrera inmediatamente después de una estación ("correr cansado") |
 | `simulation` | Simulacro parcial o completo de HYROX |
+| `test` | Test para estimar los ritmos (p. ej. 3 km a tope o 30 min continuos) |
+| `race` | La carrera objetivo |
 | `rest` | Descanso |
 
 ### Prescripción de un bloque
@@ -36,7 +39,9 @@ Un bloque de carrera se prescribe **por distancia** con un ritmo objetivo (rango
 
 ## 2. Ritmos
 
-Entrada: una marca reciente (distancia + tiempo), p. ej. 10k en 45:00.
+Entrada: una marca elegida por el usuario (distancia + tiempo), p. ej. 10k en 45:00. No hay límite de antigüedad: el usuario decide qué marca le representa hoy.
+
+La marca fija los ritmos. El tiempo objetivo nunca los cambia: solo se compara con la marca para mostrar si es realista.
 
 1. Calcular tiempos equivalentes en otras distancias con la fórmula de Riegel: `T2 = T1 × (D2 / D1)^1.06`.
 2. Definir zonas a partir del ritmo de 10k equivalente (s/km). Propuesta inicial:
@@ -51,14 +56,19 @@ Entrada: una marca reciente (distancia + tiempo), p. ej. 10k en 45:00.
 
 Estos porcentajes son provisionales y deben revisarse con un entrenador. Viven en un archivo de configuración, no repartidos por el código.
 
-Sin marca reciente: estimar desde un test (p. ej. 3 km a tope o 30 min continuos) que la app propone en la primera semana.
+Las zonas tienen huecos a propósito: esos ritmos no se prescriben. Solo para clasificar lo registrado, cada hueco se reparte entre sus dos zonas por el punto medio (p. ej. entre Z2 y Z3, el límite es +12,5 %).
+
+Sin marca: estimar desde una sesión `test` que la app propone en la primera semana. Hasta tener el resultado, las sesiones se prescriben por sensaciones (RPE), sin ritmos.
 
 ## 3. Reglas del generador
 
-- **Periodización** hacia atrás desde la fecha de la carrera: puesta a punto (1–2 semanas), específica, construcción, base. Si hay poco tiempo, se recorta primero la base.
-- **Volumen:** subida semanal de carrera ≤ ~10 %. Cada 3–4 semanas, una semana de descarga (−20 a −30 %).
+- **Periodización** hacia atrás desde la fecha de la carrera: puesta a punto (1–2 semanas), específica, construcción, base. Si hay poco tiempo, se recorta primero la base, salvo a principiantes: a ellos no se les recorta y la app avisa de que el plazo es corto.
+- **Volumen:** el plan parte del volumen semanal actual del usuario. La subida semanal de carrera no supera el mayor de estos dos valores: 10 % o +3 km (provisional). Se compara siempre con la última semana normal, no con una de descarga. Cada 3–4 semanas, una semana de descarga (−20 a −30 %).
+- **Semana parcial:** si el plan empieza a mitad de semana, esos días son suaves y no cuentan para el volumen. La primera semana completa empieza el lunes siguiente.
 - **Distribución de intensidad:** la mayor parte del volumen de carrera (≈ 80 %) en Z1–Z2; el resto de calidad.
-- **Días:** como máximo 2 sesiones de calidad de carrera por semana. Nunca dos días duros seguidos. La tirada larga, normalmente en fin de semana.
+- **Días duros:** son los que tienen series, tempo, tirada larga, fuerza pesada de pierna, simulacro, carrera o una actividad fija. Nunca dos días duros seguidos. Dos sesiones el mismo día cuentan como un solo día.
+- **Días:** como máximo 2 sesiones de calidad de carrera por semana. La tirada larga, normalmente en fin de semana. Las actividades fijas no se mueven: el plan organiza la semana a su alrededor.
+- **Prioridad si no cabe todo:** tirada larga, primera sesión de calidad, primera sesión de fuerza, rodaje, segunda sesión de calidad.
 - **Fuerza:** mínimo 1–2 sesiones por semana en todos los planes (en HYROX, más). No poner fuerza pesada de pierna el día antes de series.
 - **HYROX:** desde la fase de construcción, al menos una sesión semanal combinada (carrera + estaciones). Carreras comprometidas en la fase específica. Uno o dos simulacros parciales antes de la puesta a punto.
 - **Ajuste por registro:** si el usuario falla o marca RPE muy alto en varias sesiones seguidas, la semana siguiente baja carga. (Fase 1 puede limitarse a mostrarlo; el ajuste automático puede venir después.)
@@ -89,6 +99,8 @@ Entrada: tiempo objetivo total y categoría. Salida: ritmo por cada km de carrer
 ## 5. Preguntas abiertas
 
 - ¿Qué porcentajes de zona usamos definitivamente? → revisar con un entrenador o graduado en CAFD.
+- ¿Es adecuado el margen de +3 km por semana para quien parte de poco volumen? → revisar con un entrenador o graduado en CAFD.
+- Si un principiante tiene poco tiempo y no se le recorta la base, ¿qué fase se acorta?
 - ¿Cómo sustituimos estaciones si el usuario no tiene trineo, SkiErg o remo? (tabla de sustituciones por material)
 - ¿Cuántas semanas mínimas y máximas admite un plan? (propuesta: 6–24)
 - ¿Formato exacto de las plantillas de plan para que sea fácil contribuir?
