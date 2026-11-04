@@ -71,7 +71,7 @@ Regla clave: **`src/engine` no importa nada de la interfaz.** Debe poder ejecuta
 
 ## Estado actual
 
-Fase 0 (cimientos) hecha en local, pendiente de revisión del autor. Faltan dos puntos que necesitan su cuenta: repositorio en GitHub y despliegue automático. Después, Fase 1 (MVP para el autor): cuestionario + plan de 10k + pantalla "Hoy" + registro. Ver `docs/ROADMAP.md` y actualiza esta sección al cerrar cada fase.
+Fase 0 (cimientos) cerrada. La app se publica en <https://christianvr57-jpg.github.io/openhybrid/> con cada subida a `main`, si pasan lint, typecheck y tests. Siguiente paso: Fase 1 (MVP para el autor): cuestionario + plan de 10k + pantalla "Hoy" + registro. Ver `docs/ROADMAP.md` y actualiza esta sección al cerrar cada fase.
 
 Decisiones técnicas de la Fase 0:
 
@@ -80,6 +80,7 @@ Decisiones técnicas de la Fase 0:
 - Dexie, Zustand y Zod se instalan en la Fase 1, cuando haya código que los use.
 - Los iconos PNG se generan con `node scripts/generate-icons.mjs`.
 - ESLint impide que `src/engine` importe la interfaz o use APIs del navegador.
+- GitHub Pages sirve la app bajo `/openhybrid/`: la ruta llega por la variable `BASE_PATH`. En local sigue siendo la raíz.
 
 ## Sobre el autor
 

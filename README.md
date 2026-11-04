@@ -2,7 +2,7 @@
 
 Planes de entrenamiento de HYROX y running, gratis y abiertos. Sin suscripciones, sin cuentas, sin anuncios.
 
-> Estado: en desarrollo (fase 0).
+> Estado: en desarrollo (fase 1). Versión publicada: <https://christianvr57-jpg.github.io/openhybrid/>
 
 ## Qué hace
 

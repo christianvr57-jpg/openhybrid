@@ -10,8 +10,8 @@ Cada fase termina con algo usable. No se empieza una fase sin cerrar la anterior
 - [x] i18n básico (es/en)
 - [x] PWA instalable (manifest + service worker)
 - [x] LICENSE (AGPL-3.0-or-later), aviso CC BY-SA en `src/plans/`
-- [ ] Repositorio en GitHub
-- [ ] Despliegue automático en GitHub Pages o Cloudflare Pages
+- [x] Repositorio en GitHub
+- [x] Despliegue automático en GitHub Pages
 
 ## Fase 1 — MVP para el autor (objetivo: 10k del 7 de marzo de 2027)
 
