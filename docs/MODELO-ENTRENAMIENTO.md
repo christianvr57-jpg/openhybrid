@@ -101,6 +101,9 @@ Entrada: tiempo objetivo total y categoría. Salida: ritmo por cada km de carrer
 - ¿Qué porcentajes de zona usamos definitivamente? → revisar con un entrenador o graduado en CAFD.
 - ¿Es adecuado el margen de +3 km por semana para quien parte de poco volumen? → revisar con un entrenador o graduado en CAFD.
 - Si un principiante tiene poco tiempo y no se le recorta la base, ¿qué fase se acorta?
+- ¿Cómo funciona un plan sin carrera con fecha (quien aún no tiene inscripción, o un bloque de running entre competiciones)? Hoy todo el plan se calcula hacia atrás desde la fecha.
+- ¿Cómo se mide y progresa la carga de estaciones y fuerza? La regla del 10 % solo cubre la carrera.
+- ¿Puede servir un tiempo de HYROX como marca de referencia? Hoy los ritmos solo salen de una marca de carrera a pie.
 - ¿Cómo sustituimos estaciones si el usuario no tiene trineo, SkiErg o remo? (tabla de sustituciones por material)
 - ¿Cuántas semanas mínimas y máximas admite un plan? (propuesta: 6–24)
 - ¿Formato exacto de las plantillas de plan para que sea fácil contribuir?

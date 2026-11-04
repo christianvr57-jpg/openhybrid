@@ -4,7 +4,7 @@ Contexto del proyecto para las sesiones de Claude Code. Léelo entero antes de t
 
 ## Qué es
 
-openHybrid es una app gratuita y de código abierto que genera planes de entrenamiento de **HYROX** y **running** (5k, 10k, media maratón) y permite seguirlos y registrarlos. Existe para que cualquiera tenga acceso a buenos planes sin suscripciones.
+openHybrid es una app gratuita y de código abierto que genera planes de entrenamiento de **HYROX** y permite seguirlos y registrarlos. El **running** (5k, 10k, media maratón) es secundario: se entrena como complemento en los periodos sin competiciones oficiales. Existe para que cualquiera tenga acceso a buenos planes sin suscripciones.
 
 Inspiración: openGym (gym tracker de Duarte Santos). Tomamos ideas, **nunca código** (es AGPL y este proyecto empieza de cero).
 
@@ -71,7 +71,7 @@ Regla clave: **`src/engine` no importa nada de la interfaz.** Debe poder ejecuta
 
 ## Estado actual
 
-Fase 0 (cimientos) cerrada. La app se publica en <https://christianvr57-jpg.github.io/openhybrid/> con cada subida a `main`, si pasan lint, typecheck y tests. Siguiente paso: Fase 1 (MVP para el autor): cuestionario + plan de 10k + pantalla "Hoy" + registro. Ver `docs/ROADMAP.md` y actualiza esta sección al cerrar cada fase.
+Fase 0 (cimientos) cerrada. La app se publica en <https://christianvr57-jpg.github.io/openhybrid/> con cada subida a `main`, si pasan lint, typecheck y tests. Siguiente paso: Fase 1 (MVP de HYROX): datos oficiales verificados + plan de HYROX + cuestionario + pantalla "Hoy" + registro. Ver `docs/ROADMAP.md` y actualiza esta sección al cerrar cada fase.
 
 Decisiones técnicas de la Fase 0:
 
@@ -84,4 +84,4 @@ Decisiones técnicas de la Fase 0:
 
 ## Sobre el autor
 
-Christian, gestor de proyectos (no desarrollador profesional). Explica las decisiones técnicas en lenguaje claro y en español. Prepara un 10k (7 de marzo de 2027) combinándolo con fuerza en gimnasio: es el primer usuario real.
+Christian, gestor de proyectos (no desarrollador profesional). Explica las decisiones técnicas en lenguaje claro y en español. La app se diseña para quien entrena HYROX y carreras en general, no para un caso personal.

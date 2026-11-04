@@ -2,6 +2,8 @@
 
 Cada fase termina con algo usable. No se empieza una fase sin cerrar la anterior.
 
+HYROX es el producto principal. El running es secundario: se entrena como complemento en los periodos sin competiciones oficiales.
+
 ## Fase 0 — Cimientos
 
 - [x] Proyecto Vite + React + TypeScript (strict) creado y arrancando
@@ -13,35 +15,37 @@ Cada fase termina con algo usable. No se empieza una fase sin cerrar la anterior
 - [x] Repositorio en GitHub
 - [x] Despliegue automático en GitHub Pages
 
-## Fase 1 — MVP para el autor (objetivo: 10k del 7 de marzo de 2027)
+## Fase 1 — MVP de HYROX
 
+- [ ] `src/plans/hyrox-divisions.json` verificado contra el reglamento oficial vigente
 - [ ] `src/engine/model.ts`: tipos del dominio según `docs/MODELO-ENTRENAMIENTO.md`
 - [ ] `src/engine/paces.ts`: Riegel + zonas, con tests
-- [ ] `src/engine/generate.ts`: plan de 10k por fases, con tests de cordura
-- [ ] Cuestionario de inicio (objetivo, fecha, marca, volumen actual, días, actividades fijas, material) + aviso de salud
-- [ ] Pantalla "Hoy": sesión del día con ritmos concretos
+- [ ] `src/engine/generate.ts`: plan de HYROX por fases (fuerza + carrera + estaciones + carreras comprometidas + simulacros), con tests de cordura
+- [ ] Sustituciones de estaciones según material disponible
+- [ ] Cuestionario de inicio (objetivo, fecha, categoría, marca, volumen actual, días, actividades fijas, material) + aviso de salud
+- [ ] Pantalla "Hoy": sesión del día con ritmos y cargas concretos
 - [ ] Vista del plan completo por semanas
 - [ ] Registro de sesión hecha (completada, tiempos, RPE, notas)
 - [ ] Historial
 - [ ] Exportar/importar copia de seguridad (JSON)
 
-## Fase 2 — HYROX
+## Fase 2 — Herramientas de HYROX
 
-- [ ] `src/plans/hyrox-divisions.json` verificado contra el reglamento oficial vigente
-- [ ] Plan de HYROX (fuerza + carrera + estaciones + carreras comprometidas + simulacros)
-- [ ] Sustituciones de estaciones según material disponible
 - [ ] Calculadora de parciales: tiempo objetivo → ritmo por km, tiempo por estación, ROXZONE
 - [ ] Modo simulacro con cronómetro por tramos y récords por estación
 
-## Fase 3 — Publicación
+## Fase 3 — Running como complemento
 
-- [ ] Planes de 5k y media maratón
+- [ ] Planes de 5k, 10k y media maratón para los periodos sin competiciones oficiales
+
+## Fase 4 — Publicación
+
 - [ ] Revisión de las plantillas por un profesional (entrenador / CAFD)
 - [ ] Guía para contribuir planes (`CONTRIBUTING.md`)
 - [ ] Web del proyecto con demo
 - [ ] App nativa con Capacitor (compilada en el Mac): App Store y APK de Android
 
-## Fase 4 — Ecosistema
+## Fase 5 — Ecosistema
 
 - [ ] Exportar sesiones como entrenos estructurados (Suunto, Garmin, Apple Watch)
 - [ ] Importar actividades desde Strava
