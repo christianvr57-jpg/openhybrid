@@ -1,0 +1,99 @@
+:root {
+  --color-bg: #f6f7f4;
+  --color-text: #17211d;
+  --color-muted: #55635c;
+  --color-accent: #14342b;
+  --color-on-accent: #f6f7f4;
+  --color-border: #c9d1cb;
+
+  color-scheme: light dark;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #101a16;
+    --color-text: #eef2ef;
+    --color-muted: #a3b1a9;
+    --color-accent: #f2c14e;
+    --color-on-accent: #101a16;
+    --color-border: #33423b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: max(1.5rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
+}
+
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  line-height: 1.1;
+}
+
+.tagline {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.status {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.language {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.language button {
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.language button[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.disclaimer {
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
