@@ -133,13 +133,18 @@ export interface Week {
   startDate: IsoDate
   phase: Phase
   isDeload: boolean
+  /** Easy days before the first Monday. They do not count for volume rules. */
+  isPartial: boolean
   runMeters: number
   sessions: Session[]
 }
 
+export type PlanWarning = 'short_timeline'
+
 export interface Plan {
   goal: Goal
   weeks: Week[]
+  warnings: PlanWarning[]
 }
 
 export interface LoggedSession {

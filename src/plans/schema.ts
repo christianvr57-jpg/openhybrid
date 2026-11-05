@@ -66,3 +66,50 @@ export const hyroxDivisionsSchema = z.strictObject({
 })
 
 export type HyroxDivisions = z.infer<typeof hyroxDivisionsSchema>
+
+const fraction = z.number().positive().max(1)
+
+const strengthExercise = z.strictObject({
+  exercise: z.string().min(1),
+  sets: z.number().int().positive(),
+  reps: z.number().int().positive(),
+  rir: z.number().int().nonnegative(),
+})
+
+export const hyroxTemplateSchema = z.strictObject({
+  minWeeks: z.number().int().positive(),
+  maxWeeks: z.number().int().positive(),
+  minTrainingDays: z.number().int().min(1).max(7),
+  continuousWeeks: z.number().int().positive(),
+  cycleWeeks: z.number().int().min(2),
+  deloadFactor: fraction,
+  weeklyIncreaseFraction: fraction,
+  weeklyIncreaseMeters: z.number().positive(),
+  minWeeklyRunMeters: z.number().positive(),
+  volumeCapMeters: z.strictObject({
+    beginner: z.number().positive(),
+    intermediate: z.number().positive(),
+    advanced: z.number().positive(),
+  }),
+  volumeCapPerTrainingDayMeters: z.number().positive(),
+  preRaceTaperFactor: fraction,
+  raceWeekFactor: fraction,
+  raceWeekEasyMaxMeters: z.number().positive(),
+  longTaperMinWeeks: z.number().int().positive(),
+  phaseWeeks: z.strictObject({
+    base: z.number().int().positive(),
+    build: z.number().int().positive(),
+    specific: z.number().int().positive(),
+  }),
+  shortPlanTrainingWeeks: z.number().int().positive(),
+  qualityShare: fraction,
+  longRunShare: fraction,
+  stationSteps: z.array(z.strictObject({ distance: fraction, load: fraction })).min(1),
+  continuousMaxStationStep: z.number().int().nonnegative(),
+  strength: z.strictObject({
+    heavy: z.array(strengthExercise).min(1),
+    general: z.array(strengthExercise).min(1),
+  }),
+})
+
+export type HyroxTemplate = z.infer<typeof hyroxTemplateSchema>

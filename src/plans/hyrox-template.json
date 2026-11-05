@@ -1,0 +1,41 @@
+{
+  "minWeeks": 6,
+  "maxWeeks": 24,
+  "minTrainingDays": 3,
+  "continuousWeeks": 12,
+  "cycleWeeks": 4,
+  "deloadFactor": 0.75,
+  "weeklyIncreaseFraction": 0.1,
+  "weeklyIncreaseMeters": 3000,
+  "minWeeklyRunMeters": 3000,
+  "volumeCapMeters": { "beginner": 30000, "intermediate": 45000, "advanced": 60000 },
+  "volumeCapPerTrainingDayMeters": 9000,
+  "preRaceTaperFactor": 0.7,
+  "raceWeekFactor": 0.5,
+  "raceWeekEasyMaxMeters": 5000,
+  "longTaperMinWeeks": 8,
+  "phaseWeeks": { "base": 6, "build": 6, "specific": 4 },
+  "shortPlanTrainingWeeks": 12,
+  "qualityShare": 0.2,
+  "longRunShare": 0.4,
+  "stationSteps": [
+    { "distance": 0.5, "load": 0.6 },
+    { "distance": 0.75, "load": 0.6 },
+    { "distance": 0.75, "load": 0.8 },
+    { "distance": 1, "load": 0.8 },
+    { "distance": 1, "load": 1 }
+  ],
+  "continuousMaxStationStep": 2,
+  "strength": {
+    "heavy": [
+      { "exercise": "back_squat", "sets": 4, "reps": 6, "rir": 2 },
+      { "exercise": "romanian_deadlift", "sets": 3, "reps": 8, "rir": 2 },
+      { "exercise": "walking_lunge", "sets": 3, "reps": 10, "rir": 2 }
+    ],
+    "general": [
+      { "exercise": "bench_press", "sets": 3, "reps": 8, "rir": 2 },
+      { "exercise": "barbell_row", "sets": 3, "reps": 8, "rir": 2 },
+      { "exercise": "plank", "sets": 3, "reps": 1, "rir": 2 }
+    ]
+  }
+}

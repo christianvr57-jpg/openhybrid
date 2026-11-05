@@ -64,17 +64,20 @@ Un tiempo de HYROX no sirve como marca: mezcla carrera, estaciones y transicione
 
 ## 3. Reglas del generador
 
-- **Periodización** hacia atrás desde la fecha de la carrera: puesta a punto (1–2 semanas), específica, construcción, base. Si hay poco tiempo, se recorta primero la base, salvo a principiantes: a ellos no se les recorta y la app avisa de que el plazo es corto.
+- **Periodización** hacia atrás desde la fecha de la carrera: puesta a punto (1–2 semanas), específica, construcción, base. Si hay poco tiempo, se recorta primero la base, salvo a principiantes: a ellos no se les recorta, se acorta la construcción y la app avisa de que el plazo es corto. Un plan con fecha dura entre 6 y 24 semanas (provisional).
 - **Sin fecha de carrera:** el plan avanza en ciclos continuos de 4 semanas (3 de carga y 1 de descarga), con fases de base y construcción, sin fase específica ni puesta a punto. Al añadir una fecha, el plan se recalcula hacia atrás desde ella. Esto sirve también para los bloques de running entre competiciones.
 - **Volumen:** el plan parte del volumen semanal actual del usuario. La subida semanal de carrera no supera el mayor de estos dos valores: 10 % o +3 km (provisional). Se compara siempre con la última semana normal, no con una de descarga. Cada 3–4 semanas, una semana de descarga (−20 a −30 %).
+- **Techo de volumen:** el volumen semanal de carrera no sube de 30 km (principiante), 45 km (intermedio) o 60 km (avanzado). Tampoco sube de 9 km por día de entrenamiento disponible, para que ninguna sesión sea desproporcionada. Al llegar al techo se mantiene, con sus descargas. Quien ya corra más conserva su volumen actual, sin subirlo. Cifras provisionales.
 - **Semana parcial:** si el plan empieza a mitad de semana, esos días son suaves y no cuentan para el volumen. La primera semana completa empieza el lunes siguiente.
 - **Distribución de intensidad:** la mayor parte del volumen de carrera (≈ 80 %) en Z1–Z2; el resto de calidad.
-- **Días duros:** son los que tienen series, tempo, tirada larga, fuerza pesada de pierna, simulacro, carrera o una actividad fija. Nunca dos días duros seguidos. Dos sesiones el mismo día cuentan como un solo día.
+- **Días duros:** son los que tienen series, tempo, tirada larga, fuerza pesada de pierna, sesión combinada, carrera comprometida, test, simulacro, carrera o una actividad fija. Nunca dos días duros seguidos. Dos sesiones el mismo día cuentan como un solo día.
 - **Días:** como máximo 2 sesiones de calidad de carrera por semana. La tirada larga, normalmente en fin de semana. Las actividades fijas no se mueven: el plan organiza la semana a su alrededor.
 - **Prioridad si no cabe todo:** tirada larga, primera sesión de calidad, primera sesión de fuerza, rodaje, segunda sesión de calidad.
 - **Fuerza:** mínimo 1–2 sesiones por semana en todos los planes (en HYROX, más). No poner fuerza pesada de pierna el día antes de series.
 - **HYROX:** desde la fase de construcción, al menos una sesión semanal combinada (carrera + estaciones). Carreras comprometidas en la fase específica. Uno o dos simulacros parciales antes de la puesta a punto.
 - **Carga de estaciones:** progresa por fases como porcentaje de lo oficial en la categoría del usuario (distancia o repeticiones, y peso), p. ej. del 50 % al 100 %. En cada paso sube una sola variable. Los porcentajes son provisionales y viven en datos, no en el código.
+- **Valores iniciales del generador:** viven en `src/plans/hyrox-template.json` y son provisionales. Fases ideales de 6 semanas de base, 6 de construcción y 4 específicas; descarga de −25 % cada 4 semanas; puesta a punto de 2 semanas (1 si el plan dura menos de 8). Las estaciones pasan por cinco pasos, de 50 % de distancia y 60 % de peso hasta el 100 % de ambos.
+- **Prioridad en HYROX:** la sesión combinada ocupa el lugar de la primera sesión de calidad desde la fase de construcción. Con 4 días o menos, la fuerza de pierna se junta con otra sesión dura para dejar sitio al rodaje.
 - **Carga de fuerza:** se regula por RIR (repeticiones en reserva): el usuario elige el peso que le deja las repeticiones en reserva indicadas.
 - **Ajuste por registro:** si el usuario falla o marca RPE muy alto en varias sesiones seguidas, la semana siguiente baja carga. (Fase 1 puede limitarse a mostrarlo; el ajuste automático puede venir después.)
 
@@ -105,9 +108,7 @@ Entrada: tiempo objetivo total y categoría. Salida: ritmo por cada km de carrer
 
 - ¿Qué porcentajes de zona usamos definitivamente? → revisar con un entrenador o graduado en CAFD.
 - ¿Es adecuado el margen de +3 km por semana para quien parte de poco volumen? → revisar con un entrenador o graduado en CAFD.
-- Si un principiante tiene poco tiempo y no se le recorta la base, ¿qué fase se acorta?
 - ¿Qué porcentajes de distancia y peso usamos en cada fase para las estaciones? → revisar con un entrenador o graduado en CAFD.
-- En ciclos continuos, ¿hasta dónde sube el volumen? Sin fecha de carrera, la regla del 10 % o +3 km no tiene final y hace falta un techo.
+- ¿Son adecuados los techos de volumen por nivel (30, 45 y 60 km)? → revisar con un entrenador o graduado en CAFD.
 - ¿Cómo sustituimos estaciones si el usuario no tiene trineo, SkiErg o remo? (tabla de sustituciones por material)
-- ¿Cuántas semanas mínimas y máximas admite un plan? (propuesta: 6–24)
 - ¿Formato exacto de las plantillas de plan para que sea fácil contribuir?
