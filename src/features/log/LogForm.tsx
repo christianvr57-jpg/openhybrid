@@ -1,38 +1,30 @@
 import { useState, type FormEvent } from 'react'
 import type { IsoDate, LoggedSession, LogStatus, Session } from '../../engine/model'
 import { useI18n } from '../../i18n/index.tsx'
+import { formatClock } from '../format'
 import { parseTime } from '../onboarding/form'
 
 const STATUSES: LogStatus[] = ['done', 'partial', 'skipped']
 
-function formatTime(seconds: number | undefined): string {
-  if (seconds === undefined) {
-    return ''
-  }
-  const minutes = Math.floor(seconds / 60)
-  const rest = String(seconds % 60).padStart(2, '0')
-  return minutes < 60
-    ? `${minutes}:${rest}`
-    : `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, '0')}:${rest}`
-}
-
 export function LogForm({
   session,
   date,
-  index,
+  id,
   log,
   onSave,
 }: {
   session: Session
   date: IsoDate
-  index: number
+  id: string
   log: LoggedSession | undefined
   onSave: (log: LoggedSession) => void
 }) {
   const { t } = useI18n()
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<LogStatus>(log?.status ?? 'done')
-  const [time, setTime] = useState(formatTime(log?.durationSeconds))
+  const [time, setTime] = useState(
+    log?.durationSeconds === undefined ? '' : formatClock(log.durationSeconds),
+  )
   const [rpe, setRpe] = useState(log?.rpe === undefined ? '' : String(log.rpe))
   const [notes, setNotes] = useState(log?.notes ?? '')
   const [invalid, setInvalid] = useState(false)
@@ -48,7 +40,7 @@ export function LogForm({
     setInvalid(false)
     setOpen(false)
     onSave({
-      id: `${date}:${index}`,
+      id,
       date,
       type: session.type,
       status,

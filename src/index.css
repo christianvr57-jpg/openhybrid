@@ -369,6 +369,54 @@ button.danger {
   outline: 2px solid var(--color-accent);
 }
 
+.tabs button,
+.tabs button[aria-pressed='true'] {
+  padding: 0 0.25rem;
+  font-size: 1.0625rem;
+}
+
+.clock {
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-size: 5rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+.lap {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.splits {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+}
+
+.splits th,
+.splits td {
+  padding: 0.625rem 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.splits th {
+  font-weight: 400;
+  text-align: left;
+}
+
+.splits td {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
 .disclaimer {
   margin-top: 1rem;
   color: var(--color-muted);

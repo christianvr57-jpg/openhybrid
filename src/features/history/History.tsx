@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from 'react'
 import { parseBackup, serializeBackup, type ActivePlan, type Backup } from '../../data/backup'
-import type { LoggedSession, SessionType } from '../../engine/model'
+import type { LoggedSession, SessionType, Simulation } from '../../engine/model'
 import { useI18n } from '../../i18n/index.tsx'
 import { formatDate } from '../format'
 
@@ -15,12 +15,14 @@ function downloadBackup(text: string, date: string): void {
 
 export function History({
   logs,
+  simulations,
   active,
   today,
   onDelete,
   onImport,
 }: {
   logs: LoggedSession[]
+  simulations: Simulation[]
   active: ActivePlan | null
   today: string
   onDelete: (id: string) => void
@@ -28,7 +30,7 @@ export function History({
 }) {
   const { locale, t } = useI18n()
   const [result, setResult] = useState<'backup.imported' | 'backup.invalid' | null>(null)
-  const sorted = [...logs].sort((a, b) => b.id.localeCompare(a.id))
+  const sorted = [...logs].sort((a, b) => b.date.localeCompare(a.date))
   const done = logs.filter((log) => log.status === 'done').length
 
   const importFile = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +83,7 @@ export function History({
       <div className="actions">
         <button
           type="button"
-          onClick={() => downloadBackup(serializeBackup({ active, logs }), today)}
+          onClick={() => downloadBackup(serializeBackup({ active, logs, simulations }), today)}
         >
           {t('backup.export')}
         </button>

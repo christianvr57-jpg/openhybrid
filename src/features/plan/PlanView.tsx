@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { PlanInputError } from '../../engine/generate'
 import type { IsoDate, LoggedSession, Plan, Session, Week } from '../../engine/model'
-import { dateInWeek, weekOf } from '../../engine/schedule'
+import { dateInWeek, logId, weekOf } from '../../engine/schedule'
 import type { MessageKey } from '../../i18n/es.ts'
 import { useI18n } from '../../i18n/index.tsx'
 import { formatDate, formatDistance } from '../format'
@@ -19,12 +19,14 @@ const PRINCIPLES = [
 
 function WeekDetails({
   week,
+  planId,
   isCurrent,
   today,
   logs,
   onLog,
 }: {
   week: Week
+  planId: string | undefined
   isCurrent: boolean
   today: IsoDate
   logs: LoggedSession[]
@@ -57,8 +59,8 @@ function WeekDetails({
               <LogForm
                 session={session}
                 date={date}
-                index={index}
-                log={logs.find((item) => item.id === `${date}:${index}`)}
+                id={logId(planId, date, index)}
+                log={logs.find((item) => item.id === logId(planId, date, index))}
                 onSave={(log) => onLog(log, session)}
               />
             )}
@@ -121,6 +123,7 @@ function DateForm({
 
 export function PlanView({
   plan,
+  planId,
   today,
   logs,
   onLog,
@@ -128,6 +131,7 @@ export function PlanView({
   onRestart,
 }: {
   plan: Plan
+  planId: string | undefined
   today: IsoDate
   logs: LoggedSession[]
   onLog: (log: LoggedSession, session: Session) => void
@@ -153,6 +157,7 @@ export function PlanView({
         <WeekDetails
           key={week.number}
           week={week}
+          planId={planId}
           isCurrent={week === current}
           today={today}
           logs={logs}

@@ -135,3 +135,19 @@ export const hyroxSubstitutionsSchema = z.partialRecord(
 )
 
 export type HyroxSubstitutions = z.infer<typeof hyroxSubstitutionsSchema>
+
+const share = z.number().positive().max(1)
+
+export const hyroxSplitsSchema = z
+  .strictObject({
+    runShare: share,
+    roxzoneShare: share,
+    stationShares: z.record(z.enum(stationIds), share),
+  })
+  .refine(
+    ({ runShare, roxzoneShare, stationShares }) => {
+      const stations = Object.values(stationShares).reduce((total, item) => total + item, 0)
+      return Math.abs(runShare + roxzoneShare + stations - 1) < 0.001
+    },
+    { message: 'Shares must add up to 1' },
+  )

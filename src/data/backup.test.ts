@@ -32,6 +32,15 @@ const backup: Backup = {
     }),
   },
   logs: [log],
+  simulations: [
+    {
+      id: '1',
+      date: '2026-11-10',
+      divisionId: 'singles_men',
+      splits: [{ segment: 'run_1', seconds: 300 }],
+      totalSeconds: 300,
+    },
+  ],
 }
 
 describe('backup', () => {
@@ -40,8 +49,13 @@ describe('backup', () => {
   })
 
   it('accepts a backup with no active plan', () => {
-    const empty = { active: null, logs: [] }
+    const empty = { active: null, logs: [], simulations: [] }
     expect(parseBackup(serializeBackup(empty))).toEqual(empty)
+  })
+
+  it('reads backups made before simulations existed', () => {
+    const old = '{"app":"openhybrid","version":1,"active":null,"logs":[]}'
+    expect(parseBackup(old)).toEqual({ active: null, logs: [], simulations: [] })
   })
 
   it.each([

@@ -29,6 +29,14 @@ function mondayOf(date: IsoDate): number {
   return time - weekdayIndex(time) * DAY_MS
 }
 
+/**
+ * Id of a logged session. The plan id keeps a new plan from showing the logs of an
+ * earlier plan on the same day. Plans from older versions have none.
+ */
+export function logId(planId: string | undefined, date: IsoDate, index: number): string {
+  return planId === undefined ? `${date}:${index}` : `${planId}:${date}:${index}`
+}
+
 /** Calendar date of a weekday inside a plan week. */
 export function dateInWeek(week: Week, weekday: Weekday): IsoDate {
   return toDate(mondayOf(week.startDate) + WEEKDAYS.indexOf(weekday) * DAY_MS)
@@ -72,7 +80,7 @@ const FATIGUE_RPE = 9
 
 /** True when the latest sessions were all missed, cut short or very hard. */
 export function showsFatigue(logs: readonly LoggedSession[]): boolean {
-  const latest = [...logs].sort((a, b) => b.id.localeCompare(a.id)).slice(0, FATIGUE_SESSIONS)
+  const latest = [...logs].sort((a, b) => b.date.localeCompare(a.date)).slice(0, FATIGUE_SESSIONS)
   return (
     latest.length === FATIGUE_SESSIONS &&
     latest.every((log) => log.status !== 'done' || (log.rpe ?? 0) >= FATIGUE_RPE)

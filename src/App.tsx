@@ -2,43 +2,50 @@ import { useEffect, useState } from 'react'
 import {
   clearActivePlan,
   deleteLog,
+  deleteSimulation,
   loadActivePlan,
   loadLogs,
+  loadSimulations,
   restoreBackup,
   saveActivePlan,
   saveLog,
+  saveSimulation,
   type ActivePlan,
   type Backup,
 } from './data/index.ts'
 import { generatePlan } from './engine/generate'
-import type { IsoDate, LoggedSession, Session } from './engine/model'
+import type { IsoDate, LoggedSession, Session, Simulation } from './engine/model'
 import { applyMark } from './engine/paces'
 import { reachedVolume } from './engine/schedule'
 import { todayIso } from './features/format'
 import { History } from './features/history/History'
 import { Onboarding } from './features/onboarding/Onboarding'
 import { PlanView } from './features/plan/PlanView'
+import { SimulationTimer } from './features/tools/SimulationTimer'
+import { SplitCalculator } from './features/tools/SplitCalculator'
 import { Today } from './features/today/Today'
 import { LOCALES, useI18n } from './i18n/index.tsx'
 
-const TABS = ['today', 'plan', 'history'] as const
+const TABS = ['today', 'plan', 'history', 'tools'] as const
 type Tab = (typeof TABS)[number]
 
 export function App() {
   const { locale, setLocale, t } = useI18n()
   const [active, setActive] = useState<ActivePlan | null | undefined>(undefined)
   const [logs, setLogs] = useState<LoggedSession[]>([])
+  const [simulations, setSimulations] = useState<Simulation[]>([])
   const [storageFailed, setStorageFailed] = useState(false)
   const [tab, setTab] = useState<Tab>('today')
   const today = todayIso()
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([loadActivePlan(), loadLogs()])
-      .then(([stored, storedLogs]) => {
+    Promise.all([loadActivePlan(), loadLogs(), loadSimulations()])
+      .then(([stored, storedLogs, storedSimulations]) => {
         if (!cancelled) {
           setActive(stored ?? null)
           setLogs(storedLogs)
+          setSimulations(storedSimulations)
         }
       })
       .catch(() => {
@@ -62,7 +69,7 @@ export function App() {
   }
 
   const create = (next: ActivePlan) => {
-    updatePlan(next)
+    updatePlan({ ...next, planId: String(Date.now()) })
     setTab('today')
   }
 
@@ -97,9 +104,20 @@ export function App() {
     keep(deleteLog(id))
   }
 
+  const addSimulation = (simulation: Simulation) => {
+    setSimulations([...simulations, simulation])
+    keep(saveSimulation(simulation))
+  }
+
+  const removeSimulation = (id: string) => {
+    setSimulations(simulations.filter((item) => item.id !== id))
+    keep(deleteSimulation(id))
+  }
+
   const restore = (backup: Backup) => {
     setActive(backup.active)
     setLogs(backup.logs)
+    setSimulations(backup.simulations)
     keep(restoreBackup(backup))
   }
 
@@ -119,7 +137,7 @@ export function App() {
       goal: date === '' ? goal : { ...goal, date },
       startDate: today,
     })
-    updatePlan({ athlete, startDate: today, plan })
+    updatePlan({ ...active, athlete, startDate: today, plan })
   }
 
   return (
@@ -161,11 +179,18 @@ export function App() {
             )}
             {active === null && <Onboarding today={today} onCreate={create} />}
             {active !== null && tab === 'today' && (
-              <Today plan={active.plan} today={today} logs={logs} onLog={logSession} />
+              <Today
+                plan={active.plan}
+                planId={active.planId}
+                today={today}
+                logs={logs}
+                onLog={logSession}
+              />
             )}
             {active !== null && tab === 'plan' && (
               <PlanView
                 plan={active.plan}
+                planId={active.planId}
                 today={today}
                 logs={logs}
                 onLog={logSession}
@@ -173,9 +198,22 @@ export function App() {
                 onRestart={restart}
               />
             )}
+            {active !== null && tab === 'tools' && (
+              <>
+                <SimulationTimer
+                  simulations={simulations}
+                  divisionId={active.plan.goal.divisionId}
+                  today={today}
+                  onSave={addSimulation}
+                  onDelete={removeSimulation}
+                />
+                <SplitCalculator initialSeconds={active.athlete.hyroxTimeSeconds} />
+              </>
+            )}
             {(active === null || tab === 'history') && (
               <History
                 logs={logs}
+                simulations={simulations}
                 active={active}
                 today={today}
                 onDelete={removeLog}

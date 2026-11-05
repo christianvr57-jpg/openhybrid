@@ -31,8 +31,8 @@ HYROX es el producto principal. El running es secundario: se entrena como comple
 
 ## Fase 2 — Herramientas de HYROX
 
-- [ ] Calculadora de parciales: tiempo objetivo → ritmo por km, tiempo por estación, ROXZONE
-- [ ] Modo simulacro con cronómetro por tramos y récords por estación
+- [x] Calculadora de parciales: tiempo objetivo → ritmo por km, tiempo por estación, ROXZONE
+- [x] Modo simulacro con cronómetro por tramos y récords por estación
 
 ## Fase 3 — Running como complemento
 

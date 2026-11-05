@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, formatDistance, formatPace, formatPaceRange, todayIso } from './format'
+import {
+  formatClock,
+  formatDate,
+  formatDistance,
+  formatPace,
+  formatPaceRange,
+  todayIso,
+} from './format'
 
 describe('format', () => {
   it('formats paces', () => {
@@ -7,6 +14,12 @@ describe('format', () => {
     expect(formatPace(305.4)).toBe('5:05')
     expect(formatPace(299.6)).toBe('5:00')
     expect(formatPaceRange({ fastest: 318.6, slowest: 345.6 })).toBe('5:19–5:46 /km')
+  })
+
+  it('formats clock times', () => {
+    expect(formatClock(65)).toBe('1:05')
+    expect(formatClock(3599)).toBe('59:59')
+    expect(formatClock(5405)).toBe('1:30:05')
   })
 
   it('formats distances by locale', () => {

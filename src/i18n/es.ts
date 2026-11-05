@@ -51,6 +51,34 @@ export const es = {
   'backup.imported': 'Datos importados.',
   'backup.invalid': 'Ese archivo no es una copia de seguridad válida de openHybrid.',
 
+  'nav.tools': 'Herramientas',
+
+  'calc.title': 'Calculadora de parciales',
+  'calc.help': 'Escribe tu tiempo objetivo y verás cómo repartirlo.',
+  'calc.target': 'Tiempo objetivo',
+  'calc.run': 'Cada km de carrera',
+  'calc.roxzone': 'ROXZONE (total)',
+  'calc.provisional':
+    'Reparto orientativo y provisional: es una estimación, no sale de datos oficiales. Cada atleta tiene sus puntos fuertes.',
+
+  'sim.title': 'Simulacro',
+  'sim.help':
+    'Cronometra un HYROX completo o parte de él. Pulsa al acabar cada tramo: la transición cuenta dentro del tramo.',
+  'sim.start': 'Empezar simulacro',
+  'sim.next': 'Siguiente tramo',
+  'sim.finish': 'Terminar',
+  'sim.stopHere': 'Terminar aquí',
+  'sim.cancel': 'Cancelar',
+  'sim.cancelConfirm': 'Sí, descartar',
+  'sim.progress': 'Tramo {current} de {total}',
+  'sim.run': 'Carrera {number}',
+  'sim.bestRun': 'Mejor km de carrera',
+  'sim.total': 'Total: {time}',
+  'sim.beaten': 'Nuevos récords: {records}',
+  'sim.records': 'Tus récords',
+  'sim.past': 'Simulacros anteriores',
+  'sim.segments': '{count} tramos',
+
   'form.title': 'Crea tu plan',
   'form.intro': 'Unas preguntas y tendrás tu plan. Tus respuestas no salen de este dispositivo.',
   'form.goal': 'Tu objetivo',

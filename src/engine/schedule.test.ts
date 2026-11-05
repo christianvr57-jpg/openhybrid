@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { LoggedSession, Plan, Session } from './model'
 import {
   dateInWeek,
+  logId,
   nextTrainingDate,
   reachedVolume,
   sessionsOn,
@@ -58,6 +59,16 @@ describe('schedule', () => {
     expect(nextTrainingDate(plan, '2026-11-13')).toBe('2026-11-17')
     expect(nextTrainingDate(plan, '2026-11-01')).toBe('2026-11-13')
     expect(nextTrainingDate(plan, '2026-11-22')).toBeUndefined()
+  })
+})
+
+describe('logId', () => {
+  it('separates the logs of two plans on the same day', () => {
+    expect(logId('a', '2026-11-10', 0)).not.toBe(logId('b', '2026-11-10', 0))
+  })
+
+  it('keeps the format of plans from older versions', () => {
+    expect(logId(undefined, '2026-11-10', 1)).toBe('2026-11-10:1')
   })
 })
 

@@ -162,3 +162,18 @@ export interface LoggedSession {
   rpe?: number
   notes?: string
 }
+
+export interface SimulationSplit {
+  /** `run_1` to `run_8`, or a station id. Transitions count inside each segment. */
+  segment: string
+  seconds: number
+}
+
+export interface Simulation {
+  id: string
+  date: IsoDate
+  /** Records are only compared within a division, because the weights differ. */
+  divisionId?: string
+  splits: SimulationSplit[]
+  totalSeconds: number
+}

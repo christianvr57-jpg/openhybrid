@@ -1,8 +1,10 @@
 import { z } from 'zod'
-import type { Athlete, IsoDate, LoggedSession, Plan } from '../engine/model'
+import type { Athlete, IsoDate, LoggedSession, Plan, Simulation } from '../engine/model'
 
 /** The plan in use, with the answers that produced it so it can be regenerated. */
 export interface ActivePlan {
+  /** Missing in plans from older versions. */
+  planId?: string
   athlete: Athlete
   startDate: IsoDate
   plan: Plan
@@ -11,6 +13,7 @@ export interface ActivePlan {
 export interface Backup {
   active: ActivePlan | null
   logs: LoggedSession[]
+  simulations: Simulation[]
 }
 
 const BACKUP_VERSION = 1
@@ -27,7 +30,16 @@ const logSchema = z.strictObject({
   notes: z.string().optional(),
 })
 
+const simulationSchema = z.strictObject({
+  id: z.string().min(1),
+  date: isoDate,
+  divisionId: z.string().optional(),
+  splits: z.array(z.strictObject({ segment: z.string().min(1), seconds: z.number().min(0) })),
+  totalSeconds: z.number().min(0),
+})
+
 const activeSchema = z.object({
+  planId: z.string().optional(),
   athlete: z.looseObject({ level: z.string(), racer: z.string() }),
   startDate: isoDate,
   plan: z.looseObject({
@@ -44,6 +56,7 @@ const backupSchema = z.strictObject({
   version: z.literal(BACKUP_VERSION),
   active: activeSchema.nullable(),
   logs: z.array(logSchema),
+  simulations: z.array(simulationSchema).default([]),
 })
 
 export function serializeBackup(backup: Backup): string {
@@ -58,6 +71,7 @@ export function parseBackup(text: string): Backup | undefined {
       ? {
           active: parsed.data.active as ActivePlan | null,
           logs: parsed.data.logs as LoggedSession[],
+          simulations: parsed.data.simulations,
         }
       : undefined
   } catch {

@@ -8,6 +8,15 @@ export function formatPace(secondsPerKm: number): string {
   return `${Math.floor(total / 60)}:${seconds}`
 }
 
+/** Seconds as m:ss, or h:mm:ss from one hour. */
+export function formatClock(totalSeconds: number): string {
+  const seconds = String(totalSeconds % 60).padStart(2, '0')
+  const minutes = Math.floor(totalSeconds / 60)
+  return minutes < 60
+    ? `${minutes}:${seconds}`
+    : `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, '0')}:${seconds}`
+}
+
 export function formatPaceRange(pace: PaceRange): string {
   return `${formatPace(pace.fastest)}–${formatPace(pace.slowest)} /km`
 }

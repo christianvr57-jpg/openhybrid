@@ -53,6 +53,34 @@ export const en: Messages = {
   'backup.imported': 'Data imported.',
   'backup.invalid': 'That file is not a valid openHybrid backup.',
 
+  'nav.tools': 'Tools',
+
+  'calc.title': 'Split calculator',
+  'calc.help': 'Write your target time to see how to share it out.',
+  'calc.target': 'Target time',
+  'calc.run': 'Each running km',
+  'calc.roxzone': 'ROXZONE (total)',
+  'calc.provisional':
+    'Provisional guide: this is an estimate, not official data. Every athlete has different strengths.',
+
+  'sim.title': 'Simulation',
+  'sim.help':
+    'Time a full HYROX or part of one. Tap at the end of each segment: the transition counts inside the segment.',
+  'sim.start': 'Start simulation',
+  'sim.next': 'Next segment',
+  'sim.finish': 'Finish',
+  'sim.stopHere': 'Stop here',
+  'sim.cancel': 'Cancel',
+  'sim.cancelConfirm': 'Yes, discard',
+  'sim.progress': 'Segment {current} of {total}',
+  'sim.run': 'Run {number}',
+  'sim.bestRun': 'Best running km',
+  'sim.total': 'Total: {time}',
+  'sim.beaten': 'New records: {records}',
+  'sim.records': 'Your records',
+  'sim.past': 'Past simulations',
+  'sim.segments': '{count} segments',
+
   'form.title': 'Create your plan',
   'form.intro': 'A few questions and your plan is ready. Your answers never leave this device.',
   'form.goal': 'Your goal',

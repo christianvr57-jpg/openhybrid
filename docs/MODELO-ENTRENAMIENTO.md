@@ -103,7 +103,11 @@ Distancias, cargas por categoría (Individual, Doubles y Relay; Open y Pro; homb
 
 ### Calculadora de parciales (fase 2)
 
-Entrada: tiempo objetivo total y categoría. Salida: ritmo por cada km de carrera, tiempo por estación y tiempo estimado de ROXZONE. El reparto inicial se basará en proporciones configurables, refinables con datos.
+Entrada: tiempo objetivo total. Salida: ritmo medio por km de carrera, tiempo por estación y tiempo total de ROXZONE. El reparto vive en `src/plans/hyrox-splits.json`: 50 % carrera, 8 % ROXZONE y 42 % estaciones. Es una estimación provisional, igual para todas las categorías, basada en unos pocos resultados individuales y no en datos oficiales.
+
+### Modo simulacro (fase 2)
+
+Cronometra los 16 tramos en orden (8 de carrera y 8 estaciones). La transición cuenta dentro de cada tramo, así que no hay tiempo de ROXZONE separado. Se puede terminar antes y guardar lo hecho. Los récords se comparan solo dentro de la misma categoría, porque los pesos cambian.
 
 ## 5. Preguntas abiertas
 
@@ -111,5 +115,6 @@ Entrada: tiempo objetivo total y categoría. Salida: ritmo por cada km de carrer
 - ¿Es adecuado el margen de +3 km por semana para quien parte de poco volumen? → revisar con un entrenador o graduado en CAFD.
 - ¿Qué porcentajes de distancia y peso usamos en cada fase para las estaciones? → revisar con un entrenador o graduado en CAFD.
 - ¿Son adecuados los techos de volumen por nivel (30, 45 y 60 km)? → revisar con un entrenador o graduado en CAFD.
+- ¿Qué reparto de tiempo usamos en la calculadora, y debe variar por categoría y nivel? → revisar con datos de resultados y con un entrenador.
 - ¿Son adecuadas las sustituciones de estaciones y sus equivalencias? → revisar con un entrenador o graduado en CAFD.
 - ¿Formato exacto de las plantillas de plan para que sea fácil contribuir?

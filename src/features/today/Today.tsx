@@ -1,5 +1,5 @@
 import type { IsoDate, LoggedSession, Plan } from '../../engine/model'
-import { nextTrainingDate, sessionsOn, showsFatigue } from '../../engine/schedule'
+import { logId, nextTrainingDate, sessionsOn, showsFatigue } from '../../engine/schedule'
 import { useI18n } from '../../i18n/index.tsx'
 import { formatDate } from '../format'
 import { LogForm } from '../log/LogForm'
@@ -7,11 +7,13 @@ import { SessionCard } from '../session/SessionCard'
 
 export function Today({
   plan,
+  planId,
   today,
   logs,
   onLog,
 }: {
   plan: Plan
+  planId: string | undefined
   today: IsoDate
   logs: LoggedSession[]
   onLog: (log: LoggedSession, session: ReturnType<typeof sessionsOn>[number]) => void
@@ -33,8 +35,8 @@ export function Today({
           <LogForm
             session={session}
             date={today}
-            index={index}
-            log={logs.find((item) => item.id === `${today}:${index}`)}
+            id={logId(planId, today, index)}
+            log={logs.find((item) => item.id === logId(planId, today, index))}
             onSave={(log) => onLog(log, session)}
           />
         </div>

@@ -2,7 +2,14 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from './App.tsx'
-import { loadActivePlan, loadLogs, saveActivePlan, saveLog } from './data/index.ts'
+import {
+  loadActivePlan,
+  loadLogs,
+  loadSimulations,
+  saveActivePlan,
+  saveLog,
+  saveSimulation,
+} from './data/index.ts'
 import { generatePlan } from './engine/generate'
 import type { Athlete } from './engine/model'
 import { todayIso } from './features/format'
@@ -16,6 +23,9 @@ vi.mock('./data/index.ts', () => ({
   saveLog: vi.fn(),
   deleteLog: vi.fn(),
   restoreBackup: vi.fn(),
+  loadSimulations: vi.fn(),
+  saveSimulation: vi.fn(),
+  deleteSimulation: vi.fn(),
 }))
 
 function renderApp() {
@@ -36,6 +46,8 @@ describe('App', () => {
     vi.mocked(saveActivePlan).mockResolvedValue()
     vi.mocked(saveLog).mockResolvedValue()
     vi.mocked(loadLogs).mockResolvedValue([])
+    vi.mocked(loadSimulations).mockResolvedValue([])
+    vi.mocked(saveSimulation).mockResolvedValue()
   })
 
   afterEach(() => {
@@ -165,6 +177,53 @@ describe('App', () => {
 
       expect(await screen.findByText('Día de carrera', { exact: false })).toBeDefined()
       expect(vi.mocked(saveActivePlan).mock.calls[0]?.[0].plan.goal.date).toBe(todayIso(raceDay))
+    })
+
+    it('does not show the logs of an earlier plan on the same day', async () => {
+      const stored = { ...storedPlanWithTestToday(), planId: 'new' }
+      vi.mocked(loadActivePlan).mockResolvedValue(stored)
+      vi.mocked(loadLogs).mockResolvedValue([
+        { id: `old:${todayIso()}:0`, date: todayIso(), type: 'test', status: 'done' },
+      ])
+      renderApp()
+      expect(await screen.findByText('Registrar sesión')).toBeTruthy()
+      expect(screen.queryByText('Registrada: Hecha')).toBeNull()
+    })
+
+    it('shares a target time in the split calculator', async () => {
+      vi.mocked(loadActivePlan).mockResolvedValue(storedPlanWithTestToday())
+      renderApp()
+      fireEvent.click(await screen.findByRole('button', { name: 'Herramientas' }))
+      fireEvent.change(screen.getByLabelText('Tiempo objetivo', { exact: false }), {
+        target: { value: '1:30:00' },
+      })
+      expect(screen.getByText('5:38 /km')).toBeTruthy()
+    })
+
+    it('times a simulation and saves what was done', async () => {
+      vi.mocked(loadActivePlan).mockResolvedValue(storedPlanWithTestToday())
+      renderApp()
+      fireEvent.click(await screen.findByRole('button', { name: 'Herramientas' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Empezar simulacro' }))
+      expect(screen.getByText('Carrera 1')).toBeTruthy()
+      fireEvent.click(screen.getByRole('button', { name: 'Siguiente tramo' }))
+      expect(screen.getByText('SkiErg')).toBeTruthy()
+      fireEvent.click(screen.getByRole('button', { name: 'Terminar aquí' }))
+
+      expect(saveSimulation).toHaveBeenCalledOnce()
+      expect(vi.mocked(saveSimulation).mock.calls[0]?.[0].splits).toHaveLength(1)
+      expect(localStorage.getItem('openhybrid.simulation')).toBeNull()
+    })
+
+    it('recovers a simulation in progress after closing the app', async () => {
+      vi.mocked(loadActivePlan).mockResolvedValue(storedPlanWithTestToday())
+      localStorage.setItem(
+        'openhybrid.simulation',
+        JSON.stringify({ startedAt: Date.now() - 60_000, laps: [Date.now() - 1000] }),
+      )
+      renderApp()
+      fireEvent.click(await screen.findByRole('button', { name: 'Herramientas' }))
+      expect(screen.getByText('SkiErg')).toBeTruthy()
     })
 
     it('explains why a date cannot be used', async () => {

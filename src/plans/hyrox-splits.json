@@ -1,0 +1,14 @@
+{
+  "runShare": 0.5,
+  "roxzoneShare": 0.08,
+  "stationShares": {
+    "ski_erg": 0.055,
+    "sled_push": 0.045,
+    "sled_pull": 0.055,
+    "burpee_broad_jumps": 0.06,
+    "rowing": 0.06,
+    "farmers_carry": 0.025,
+    "sandbag_lunges": 0.05,
+    "wall_balls": 0.07
+  }
+}
