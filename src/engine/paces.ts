@@ -1,5 +1,5 @@
 import { PACE_ZONES, RIEGEL_EXPONENT, TEN_K_METERS } from './config'
-import type { PaceRange, RaceMark, Zone } from './model'
+import type { PaceRange, Plan, RaceMark, Zone } from './model'
 
 function assertValidMark(mark: RaceMark): void {
   if (!(mark.distanceMeters > 0) || !(mark.timeSeconds > 0)) {
@@ -50,4 +50,24 @@ export function classifyPace(paceSecondsPerKm: number, mark: RaceMark): Zone {
     }
   }
   throw new RangeError('No pace zones configured')
+}
+
+/** Adds paces to an existing plan, keeping its schedule. Test and race stay by feel. */
+export function applyMark(plan: Plan, mark: RaceMark): Plan {
+  return {
+    ...plan,
+    weeks: plan.weeks.map((week) => ({
+      ...week,
+      sessions: week.sessions.map((session) =>
+        session.type === 'test' || session.type === 'race'
+          ? session
+          : {
+              ...session,
+              blocks: session.blocks.map((block) =>
+                block.kind === 'run' ? { ...block, pace: zonePace(mark, block.zone) } : block,
+              ),
+            },
+      ),
+    })),
+  }
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { RaceMark } from './model'
-import { classifyPace, equivalentTimeSeconds, tenKPace, zonePace } from './paces'
+import type { Plan, RaceMark } from './model'
+import { applyMark, classifyPace, equivalentTimeSeconds, tenKPace, zonePace } from './paces'
 
 const tenK45: RaceMark = { distanceMeters: 10_000, timeSeconds: 2700 }
 const fiveK20: RaceMark = { distanceMeters: 5000, timeSeconds: 1200 }
@@ -81,5 +81,33 @@ describe('classifyPace', () => {
   it('keeps extreme paces in the outer zones', () => {
     expect(classifyPace(900, tenK45)).toBe('z1')
     expect(classifyPace(120, tenK45)).toBe('z5')
+  })
+})
+
+describe('applyMark', () => {
+  const run = { kind: 'run', repeats: 1, meters: 5000, zone: 'z2' } as const
+  const plan: Plan = {
+    goal: { race: 'hyrox' },
+    warnings: [],
+    weeks: [
+      {
+        number: 1,
+        startDate: '2026-11-09',
+        phase: 'base',
+        isDeload: false,
+        isPartial: false,
+        runMeters: 10_000,
+        sessions: [
+          { type: 'easy_run', weekday: 'tuesday', blocks: [run], estimatedSeconds: 1800 },
+          { type: 'test', weekday: 'thursday', blocks: [run], estimatedSeconds: 1800 },
+        ],
+      },
+    ],
+  }
+
+  it('adds paces and keeps the test by feel', () => {
+    const [week] = applyMark(plan, tenK45).weeks
+    expect(week?.sessions[0]?.blocks[0]).toMatchObject({ pace: zonePace(tenK45, 'z2') })
+    expect(week?.sessions[1]?.blocks[0]).toEqual(run)
   })
 })

@@ -2,13 +2,13 @@
 
 Planes de entrenamiento de HYROX y running, gratis y abiertos. Sin suscripciones, sin cuentas, sin anuncios.
 
-> Estado: en desarrollo (fase 1). Versión publicada: <https://christianvr57-jpg.github.io/openhybrid/>
+> Estado: en desarrollo (fase 2). Versión publicada: <https://christianvr57-jpg.github.io/openhybrid/>
 
 ## Qué hace
 
 - Te hace unas preguntas (carrera objetivo, fecha, nivel, días disponibles, material, marca reciente) y genera un plan completo por fases.
 - Te dice qué toca hoy, con ritmos calculados para ti.
-- Registra lo que haces y ajusta lo que viene.
+- Registra lo que haces y te avisa si vas demasiado cargado.
 - Funciona sin conexión y tus datos no salen de tu dispositivo.
 
 ## Por qué

@@ -25,9 +25,9 @@ HYROX es el producto principal. El running es secundario: se entrena como comple
 - [x] Cuestionario de inicio (objetivo, fecha opcional, categoría, marca, tiempo de HYROX opcional, volumen actual, días, actividades fijas, material) + aviso de salud
 - [x] Pantalla "Hoy": sesión del día con ritmos y cargas concretos
 - [x] Vista del plan completo por semanas
-- [ ] Registro de sesión hecha (completada, tiempos, RPE, notas)
-- [ ] Historial
-- [ ] Exportar/importar copia de seguridad (JSON)
+- [x] Registro de sesión hecha (completada, tiempos, RPE, notas)
+- [x] Historial
+- [x] Exportar/importar copia de seguridad (JSON)
 
 ## Fase 2 — Herramientas de HYROX
 

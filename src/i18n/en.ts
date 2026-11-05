@@ -16,6 +16,43 @@ export const en: Messages = {
   'nav.today': 'Today',
   'nav.plan': 'Plan',
 
+  'nav.history': 'History',
+
+  'log.open': 'Log session',
+  'log.edit': 'Edit log',
+  'log.status': 'How did it go?',
+  'log.status.done': 'Done',
+  'log.status.partial': 'Partly done',
+  'log.status.skipped': 'Skipped',
+  'log.time': 'Time (optional)',
+  'log.testTime': 'Test time',
+  'log.testHelp': 'This time sets the paces of your whole plan.',
+  'log.rpe': 'Perceived effort, from 1 to 10 (optional)',
+  'log.notes': 'Notes (optional)',
+  'log.save': 'Save',
+  'log.invalidTime': 'Write the time as 45:00 or 1:45:00.',
+  'log.saved': 'Logged: {status}',
+
+  'today.fatigue':
+    'Your latest sessions were very hard or incomplete. This week, reduce the load or rest one more day.',
+
+  'plan.update': 'Race date',
+  'plan.updateHelp':
+    'Leave it empty for continuous cycles. The plan is recalculated from today with the volume you have reached.',
+  'plan.updateButton': 'Recalculate plan',
+
+  'history.title': 'History',
+  'history.empty': 'You have not logged any sessions yet.',
+  'history.summary': '{done} done out of {total} logged',
+  'history.delete': 'Delete',
+  'backup.title': 'Backup',
+  'backup.help':
+    'Your data only lives on this device. Save a copy so you do not lose it or to move it to another device. Importing replaces everything here.',
+  'backup.export': 'Export data',
+  'backup.import': 'Import data',
+  'backup.imported': 'Data imported.',
+  'backup.invalid': 'That file is not a valid openHybrid backup.',
+
   'form.title': 'Create your plan',
   'form.intro': 'A few questions and your plan is ready. Your answers never leave this device.',
   'form.goal': 'Your goal',

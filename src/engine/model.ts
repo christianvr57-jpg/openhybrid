@@ -149,10 +149,14 @@ export interface Plan {
   warnings: PlanWarning[]
 }
 
+export type LogStatus = 'done' | 'partial' | 'skipped'
+
 export interface LoggedSession {
+  /** Date and position of the session on that day. Logging again replaces it. */
+  id: string
   date: IsoDate
   type: SessionType
-  completedBlocks: number
+  status: LogStatus
   durationSeconds?: number
   /** Perceived effort from 1 to 10. */
   rpe?: number

@@ -14,7 +14,7 @@ Week         Número, fase, si es de descarga, volumen objetivo, sesiones.
 Session      Un entreno: tipo, bloques, duración estimada, intensidad. Un día puede tener varias sesiones (p. ej. fuerza y carrera).
 Block        Unidad mínima: calentamiento, serie, estación, fuerza, vuelta a la calma.
 Station      Estación HYROX (ver sección 4).
-LoggedSession  Lo que el usuario hizo de verdad: fecha, bloques completados, tiempos, RPE, notas.
+LoggedSession  Lo que el usuario hizo de verdad: fecha, estado (hecha, a medias, no hecha), tiempo, RPE, notas.
 ```
 
 ### Tipos de sesión
@@ -58,7 +58,7 @@ Estos porcentajes son provisionales y deben revisarse con un entrenador. Viven e
 
 Las zonas tienen huecos a propósito: esos ritmos no se prescriben. Solo para clasificar lo registrado, cada hueco se reparte entre sus dos zonas por el punto medio (p. ej. entre Z2 y Z3, el límite es +12,5 %).
 
-Sin marca: estimar desde una sesión `test` que la app propone en la primera semana. Hasta tener el resultado, las sesiones se prescriben por sensaciones (RPE), sin ritmos.
+Sin marca: estimar desde una sesión `test` que la app propone en la primera semana. Hasta tener el resultado, las sesiones se prescriben por sensaciones (RPE), sin ritmos. Al registrar el tiempo del test, ese resultado pasa a ser la marca y todo el plan recibe sus ritmos, sin cambiar el calendario.
 
 Un tiempo de HYROX no sirve como marca: mezcla carrera, estaciones y transiciones, y sus kilómetros se corren ya cansado. Se guarda solo para comparar el progreso y el tiempo objetivo.
 
@@ -80,7 +80,7 @@ Un tiempo de HYROX no sirve como marca: mezcla carrera, estaciones y transicione
 - **Prioridad en HYROX:** la sesión combinada ocupa el lugar de la primera sesión de calidad desde la fase de construcción. Con 4 días o menos, la fuerza de pierna se junta con otra sesión dura para dejar sitio al rodaje.
 - **Sustituciones:** si falta el material de una estación, el plan usa una alternativa de `src/plans/hyrox-substitutions.json`, en orden de preferencia: primero una máquina parecida que el usuario tenga, y si no, un ejercicio sin material especial. Los burpees no necesitan material. El día de la carrera nunca hay sustituciones. Tabla y equivalencias provisionales.
 - **Carga de fuerza:** se regula por RIR (repeticiones en reserva): el usuario elige el peso que le deja las repeticiones en reserva indicadas.
-- **Ajuste por registro:** si el usuario falla o marca RPE muy alto en varias sesiones seguidas, la semana siguiente baja carga. (Fase 1 puede limitarse a mostrarlo; el ajuste automático puede venir después.)
+- **Ajuste por registro:** si el usuario falla o marca RPE muy alto en varias sesiones seguidas, la semana siguiente baja carga. En la Fase 1 solo se muestra un aviso, cuando las 3 últimas sesiones registradas se han saltado, quedado a medias o marcado con RPE 9 o más. El ajuste automático llega después.
 
 ## 4. HYROX: formato de carrera
 

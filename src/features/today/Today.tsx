@@ -1,10 +1,21 @@
-import type { IsoDate, Plan } from '../../engine/model'
-import { nextTrainingDate, sessionsOn } from '../../engine/schedule'
+import type { IsoDate, LoggedSession, Plan } from '../../engine/model'
+import { nextTrainingDate, sessionsOn, showsFatigue } from '../../engine/schedule'
 import { useI18n } from '../../i18n/index.tsx'
 import { formatDate } from '../format'
+import { LogForm } from '../log/LogForm'
 import { SessionCard } from '../session/SessionCard'
 
-export function Today({ plan, today }: { plan: Plan; today: IsoDate }) {
+export function Today({
+  plan,
+  today,
+  logs,
+  onLog,
+}: {
+  plan: Plan
+  today: IsoDate
+  logs: LoggedSession[]
+  onLog: (log: LoggedSession, session: ReturnType<typeof sessionsOn>[number]) => void
+}) {
   const { locale, t } = useI18n()
   const sessions = sessionsOn(plan, today)
   const next = nextTrainingDate(plan, today)
@@ -14,8 +25,19 @@ export function Today({ plan, today }: { plan: Plan; today: IsoDate }) {
       <h2>{t('today.title')}</h2>
       <p className="meta">{formatDate(today, locale)}</p>
 
+      {showsFatigue(logs) && <p className="notice">{t('today.fatigue')}</p>}
+
       {sessions.map((session, index) => (
-        <SessionCard key={index} session={session} />
+        <div key={index}>
+          <SessionCard session={session} />
+          <LogForm
+            session={session}
+            date={today}
+            index={index}
+            log={logs.find((item) => item.id === `${today}:${index}`)}
+            onSave={(log) => onLog(log, session)}
+          />
+        </div>
       ))}
 
       {sessions.length === 0 && (

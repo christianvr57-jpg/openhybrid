@@ -2,13 +2,20 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from './App.tsx'
-import { loadActivePlan, saveActivePlan } from './data/index.ts'
+import { loadActivePlan, loadLogs, saveActivePlan, saveLog } from './data/index.ts'
+import { generatePlan } from './engine/generate'
+import type { Athlete } from './engine/model'
+import { todayIso } from './features/format'
 import { I18nProvider } from './i18n/index.tsx'
 
 vi.mock('./data/index.ts', () => ({
   loadActivePlan: vi.fn(),
   saveActivePlan: vi.fn(),
   clearActivePlan: vi.fn(),
+  loadLogs: vi.fn(),
+  saveLog: vi.fn(),
+  deleteLog: vi.fn(),
+  restoreBackup: vi.fn(),
 }))
 
 function renderApp() {
@@ -27,6 +34,8 @@ describe('App', () => {
   beforeEach(() => {
     vi.mocked(loadActivePlan).mockResolvedValue(undefined)
     vi.mocked(saveActivePlan).mockResolvedValue()
+    vi.mocked(saveLog).mockResolvedValue()
+    vi.mocked(loadLogs).mockResolvedValue([])
   })
 
   afterEach(() => {
@@ -73,6 +82,103 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Plan' }))
     expect(await screen.findByText('Semana 1')).toBeTruthy()
     expect(screen.getByText(/En qué se basa/)).toBeTruthy()
+  })
+
+  describe('with a plan that starts with a test today', () => {
+    const everyDay: Athlete['availableDays'] = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ]
+    const athlete: Athlete = {
+      level: 'intermediate',
+      racer: 'women',
+      weeklyRunMeters: 20_000,
+      availableDays: everyDay,
+      fixedActivities: [],
+      equipment: [],
+    }
+
+    function storedPlanWithTestToday() {
+      const startDate = todayIso()
+      const plan = generatePlan({
+        athlete,
+        goal: { race: 'hyrox', divisionId: 'singles_women' },
+        startDate,
+      })
+      const weekday = everyDay[(new Date(`${startDate}T00:00:00Z`).getUTCDay() + 6) % 7]
+      const [first, ...rest] = plan.weeks
+      if (first === undefined || weekday === undefined) {
+        throw new Error('Plan without weeks')
+      }
+      const test = {
+        type: 'test' as const,
+        weekday,
+        estimatedSeconds: 1200,
+        blocks: [{ kind: 'run' as const, repeats: 1, meters: 3000, zone: 'z5' as const }],
+      }
+      return {
+        athlete,
+        startDate,
+        plan: { ...plan, weeks: [{ ...first, sessions: [test] }, ...rest] },
+      }
+    }
+
+    it('turns the test result into paces for the whole plan', async () => {
+      vi.mocked(loadActivePlan).mockResolvedValue(storedPlanWithTestToday())
+      renderApp()
+      fireEvent.click(await screen.findByText('Registrar sesión'))
+      fireEvent.change(screen.getByLabelText('Tiempo del test', { exact: false }), {
+        target: { value: '13:00' },
+      })
+      fireEvent.click(screen.getByRole('button', { name: 'Guardar' }))
+
+      expect(await screen.findByText('Registrada: Hecha')).toBeTruthy()
+      expect(saveLog).toHaveBeenCalledOnce()
+      const saved = vi.mocked(saveActivePlan).mock.calls[0]?.[0]
+      expect(saved?.athlete.mark).toEqual({ distanceMeters: 3000, timeSeconds: 780 })
+    })
+
+    it('asks for the time of a completed test', async () => {
+      vi.mocked(loadActivePlan).mockResolvedValue(storedPlanWithTestToday())
+      renderApp()
+      fireEvent.click(await screen.findByText('Registrar sesión'))
+      fireEvent.click(screen.getByRole('button', { name: 'Guardar' }))
+
+      expect((await screen.findByRole('alert')).textContent).toMatch(/45:00/)
+      expect(saveLog).not.toHaveBeenCalled()
+    })
+
+    it('recalculates the plan with a new race date', async () => {
+      vi.mocked(loadActivePlan).mockResolvedValue(storedPlanWithTestToday())
+      renderApp()
+      fireEvent.click(await screen.findByRole('button', { name: 'Plan' }))
+      const raceDay = new Date(Date.now() + 100 * 86_400_000)
+      fireEvent.change(screen.getByLabelText('Fecha de la carrera', { exact: false }), {
+        target: { value: todayIso(raceDay) },
+      })
+      fireEvent.click(screen.getByRole('button', { name: 'Recalcular plan' }))
+
+      expect(await screen.findByText('Día de carrera', { exact: false })).toBeDefined()
+      expect(vi.mocked(saveActivePlan).mock.calls[0]?.[0].plan.goal.date).toBe(todayIso(raceDay))
+    })
+
+    it('explains why a date cannot be used', async () => {
+      vi.mocked(loadActivePlan).mockResolvedValue(storedPlanWithTestToday())
+      renderApp()
+      fireEvent.click(await screen.findByRole('button', { name: 'Plan' }))
+      fireEvent.change(screen.getByLabelText('Fecha de la carrera', { exact: false }), {
+        target: { value: todayIso(new Date(Date.now() + 7 * 86_400_000)) },
+      })
+      fireEvent.click(screen.getByRole('button', { name: 'Recalcular plan' }))
+
+      expect((await screen.findByRole('alert')).textContent).toMatch(/muy cerca/)
+      expect(saveActivePlan).not.toHaveBeenCalled()
+    })
   })
 
   it('explains why a plan cannot be created', async () => {

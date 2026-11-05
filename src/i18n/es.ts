@@ -14,6 +14,43 @@ export const es = {
   'nav.today': 'Hoy',
   'nav.plan': 'Plan',
 
+  'nav.history': 'Historial',
+
+  'log.open': 'Registrar sesión',
+  'log.edit': 'Editar registro',
+  'log.status': '¿Cómo ha ido?',
+  'log.status.done': 'Hecha',
+  'log.status.partial': 'A medias',
+  'log.status.skipped': 'No la hice',
+  'log.time': 'Tiempo (opcional)',
+  'log.testTime': 'Tiempo del test',
+  'log.testHelp': 'Con este tiempo se calculan los ritmos de todo tu plan.',
+  'log.rpe': 'Esfuerzo percibido, de 1 a 10 (opcional)',
+  'log.notes': 'Notas (opcional)',
+  'log.save': 'Guardar',
+  'log.invalidTime': 'Escribe el tiempo como 45:00 o 1:45:00.',
+  'log.saved': 'Registrada: {status}',
+
+  'today.fatigue':
+    'Tus últimas sesiones han sido muy duras o no las has completado. Esta semana, baja la carga o descansa un día más.',
+
+  'plan.update': 'Fecha de la carrera',
+  'plan.updateHelp':
+    'Déjala vacía para ciclos continuos. El plan se recalcula desde hoy con el volumen que ya has alcanzado.',
+  'plan.updateButton': 'Recalcular plan',
+
+  'history.title': 'Historial',
+  'history.empty': 'Aún no has registrado ninguna sesión.',
+  'history.summary': '{done} hechas de {total} registradas',
+  'history.delete': 'Borrar',
+  'backup.title': 'Copia de seguridad',
+  'backup.help':
+    'Tus datos solo están en este dispositivo. Guarda una copia para no perderlos o llevarlos a otro. Al importar, se sustituye todo lo que hay aquí.',
+  'backup.export': 'Exportar datos',
+  'backup.import': 'Importar datos',
+  'backup.imported': 'Datos importados.',
+  'backup.invalid': 'Ese archivo no es una copia de seguridad válida de openHybrid.',
+
   'form.title': 'Crea tu plan',
   'form.intro': 'Unas preguntas y tendrás tu plan. Tus respuestas no salen de este dispositivo.',
   'form.goal': 'Tu objetivo',

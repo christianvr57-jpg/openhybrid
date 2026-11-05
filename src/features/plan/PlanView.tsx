@@ -1,8 +1,11 @@
-import { useState } from 'react'
-import type { IsoDate, Plan, Week } from '../../engine/model'
+import { useState, type FormEvent } from 'react'
+import { PlanInputError } from '../../engine/generate'
+import type { IsoDate, LoggedSession, Plan, Session, Week } from '../../engine/model'
 import { dateInWeek, weekOf } from '../../engine/schedule'
+import type { MessageKey } from '../../i18n/es.ts'
 import { useI18n } from '../../i18n/index.tsx'
 import { formatDate, formatDistance } from '../format'
+import { LogForm } from '../log/LogForm'
 import { SessionCard } from '../session/SessionCard'
 
 const PRINCIPLES = [
@@ -14,7 +17,19 @@ const PRINCIPLES = [
   'principle.stations',
 ] as const
 
-function WeekDetails({ week, isCurrent }: { week: Week; isCurrent: boolean }) {
+function WeekDetails({
+  week,
+  isCurrent,
+  today,
+  logs,
+  onLog,
+}: {
+  week: Week
+  isCurrent: boolean
+  today: IsoDate
+  logs: LoggedSession[]
+  onLog: (log: LoggedSession, session: Session) => void
+}) {
   const { locale, t } = useI18n()
   const title = week.isPartial ? t('plan.partialWeek') : t('plan.week', { number: week.number })
   const labels = [
@@ -29,23 +44,94 @@ function WeekDetails({ week, isCurrent }: { week: Week; isCurrent: boolean }) {
       <summary>
         <strong>{title}</strong> <span className="meta">{labels.join(' · ')}</span>
       </summary>
-      {week.sessions.map((session, index) => (
-        <div key={index}>
-          <p className="day">{formatDate(dateInWeek(week, session.weekday), locale)}</p>
-          <SessionCard session={session} />
-        </div>
-      ))}
+      {week.sessions.map((session, position) => {
+        const date = dateInWeek(week, session.weekday)
+        const index = week.sessions
+          .slice(0, position)
+          .filter((item) => item.weekday === session.weekday).length
+        return (
+          <div key={position}>
+            <p className="day">{formatDate(date, locale)}</p>
+            <SessionCard session={session} />
+            {date <= today && (
+              <LogForm
+                session={session}
+                date={date}
+                index={index}
+                log={logs.find((item) => item.id === `${date}:${index}`)}
+                onSave={(log) => onLog(log, session)}
+              />
+            )}
+          </div>
+        )
+      })}
     </details>
+  )
+}
+
+function DateForm({
+  plan,
+  today,
+  onChangeDate,
+}: {
+  plan: Plan
+  today: IsoDate
+  onChangeDate: (date: IsoDate) => void
+}) {
+  const { t } = useI18n()
+  const [date, setDate] = useState(plan.goal.date ?? '')
+  const [error, setError] = useState<MessageKey | null>(null)
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault()
+    try {
+      onChangeDate(date)
+      setError(null)
+    } catch (caught) {
+      if (!(caught instanceof PlanInputError)) {
+        throw caught
+      }
+      setError(`error.${caught.code}`)
+    }
+  }
+
+  return (
+    <form className="log-entry" onSubmit={submit}>
+      <label className="log-entry">
+        {t('plan.update')}
+        <input
+          type="date"
+          min={today}
+          value={date}
+          onChange={(event) => setDate(event.target.value)}
+        />
+        <small>{t('plan.updateHelp')}</small>
+      </label>
+      {error !== null && (
+        <p className="notice" role="alert">
+          {t(error)}
+        </p>
+      )}
+      <div className="actions">
+        <button type="submit">{t('plan.updateButton')}</button>
+      </div>
+    </form>
   )
 }
 
 export function PlanView({
   plan,
   today,
+  logs,
+  onLog,
+  onChangeDate,
   onRestart,
 }: {
   plan: Plan
   today: IsoDate
+  logs: LoggedSession[]
+  onLog: (log: LoggedSession, session: Session) => void
+  onChangeDate: (date: IsoDate) => void
   onRestart: () => void
 }) {
   const { t } = useI18n()
@@ -64,8 +150,17 @@ export function PlanView({
       ))}
 
       {plan.weeks.map((week) => (
-        <WeekDetails key={week.number} week={week} isCurrent={week === current} />
+        <WeekDetails
+          key={week.number}
+          week={week}
+          isCurrent={week === current}
+          today={today}
+          logs={logs}
+          onLog={onLog}
+        />
       ))}
+
+      <DateForm plan={plan} today={today} onChangeDate={onChangeDate} />
 
       <h2>{t('principle.title')}</h2>
       <ul>

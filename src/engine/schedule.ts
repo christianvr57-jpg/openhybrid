@@ -1,4 +1,4 @@
-import type { IsoDate, Plan, Session, Week, Weekday } from './model'
+import type { IsoDate, LoggedSession, Plan, Session, Week, Weekday } from './model'
 
 const DAY_MS = 86_400_000
 
@@ -51,4 +51,30 @@ export function nextTrainingDate(plan: Plan, date: IsoDate): IsoDate | undefined
     .flatMap((week) => week.sessions.map((session) => dateInWeek(week, session.weekday)))
     .filter((sessionDate) => sessionDate > date)
     .sort()[0]
+}
+
+/** Running volume reached so far, to restart a plan from where the athlete is. */
+export function reachedVolume(plan: Plan, date: IsoDate): number {
+  const volumes = plan.weeks
+    .filter(
+      (week) =>
+        !week.isDeload &&
+        !week.isPartial &&
+        week.phase !== 'taper' &&
+        mondayOf(week.startDate) < mondayOf(date),
+    )
+    .map((week) => week.runMeters)
+  return Math.max(0, ...volumes)
+}
+
+const FATIGUE_SESSIONS = 3
+const FATIGUE_RPE = 9
+
+/** True when the latest sessions were all missed, cut short or very hard. */
+export function showsFatigue(logs: readonly LoggedSession[]): boolean {
+  const latest = [...logs].sort((a, b) => b.id.localeCompare(a.id)).slice(0, FATIGUE_SESSIONS)
+  return (
+    latest.length === FATIGUE_SESSIONS &&
+    latest.every((log) => log.status !== 'done' || (log.rpe ?? 0) >= FATIGUE_RPE)
+  )
 }

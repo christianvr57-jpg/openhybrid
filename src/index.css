@@ -158,6 +158,7 @@ small {
 
 input[type='text'],
 input[type='date'],
+input[type='number'],
 select {
   width: 100%;
   min-width: 0;
@@ -237,6 +238,61 @@ button.primary {
 button.danger {
   border-color: var(--color-danger);
   color: var(--color-danger);
+}
+
+.log {
+  margin-top: 0.5rem;
+}
+
+.log summary {
+  min-height: 2.75rem;
+  padding: 0.5rem 0;
+  cursor: pointer;
+}
+
+.log form,
+.log-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.log label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+textarea {
+  width: 100%;
+  min-height: 4.5rem;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.file {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.file input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.file:focus-within {
+  outline: 2px solid var(--color-accent);
 }
 
 .disclaimer {
