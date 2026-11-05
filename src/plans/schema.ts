@@ -151,3 +151,21 @@ export const hyroxSplitsSchema = z
     },
     { message: 'Shares must add up to 1' },
   )
+
+const runningRace = z.strictObject({
+  raceMeters: z.number().positive(),
+  raceZone: z.enum(['z1', 'z2', 'z3', 'z4', 'z5']),
+  volumeCapMeters: z.strictObject({
+    beginner: z.number().positive(),
+    intermediate: z.number().positive(),
+    advanced: z.number().positive(),
+  }),
+  longRunShare: share,
+  maxRepMeters: z.number().positive(),
+})
+
+export const runningTemplateSchema = z.strictObject({
+  '5k': runningRace,
+  '10k': runningRace,
+  '21k': runningRace,
+})

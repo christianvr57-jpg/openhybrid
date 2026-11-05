@@ -1,0 +1,23 @@
+{
+  "5k": {
+    "raceMeters": 5000,
+    "raceZone": "z5",
+    "volumeCapMeters": { "beginner": 30000, "intermediate": 45000, "advanced": 60000 },
+    "longRunShare": 0.35,
+    "maxRepMeters": 800
+  },
+  "10k": {
+    "raceMeters": 10000,
+    "raceZone": "z4",
+    "volumeCapMeters": { "beginner": 35000, "intermediate": 50000, "advanced": 65000 },
+    "longRunShare": 0.4,
+    "maxRepMeters": 1000
+  },
+  "21k": {
+    "raceMeters": 21100,
+    "raceZone": "z3",
+    "volumeCapMeters": { "beginner": 40000, "intermediate": 55000, "advanced": 70000 },
+    "longRunShare": 0.45,
+    "maxRepMeters": 2000
+  }
+}

@@ -79,6 +79,8 @@ Un tiempo de HYROX no sirve como marca: mezcla carrera, estaciones y transicione
 - **Valores iniciales del generador:** viven en `src/plans/hyrox-template.json` y son provisionales. Fases ideales de 6 semanas de base, 6 de construcción y 4 específicas; descarga de −25 % cada 4 semanas; puesta a punto de 2 semanas (1 si el plan dura menos de 8). Las estaciones pasan por cinco pasos, de 50 % de distancia y 60 % de peso hasta el 100 % de ambos.
 - **Prioridad en HYROX:** la sesión combinada ocupa el lugar de la primera sesión de calidad desde la fase de construcción. Con 4 días o menos, la fuerza de pierna se junta con otra sesión dura para dejar sitio al rodaje.
 - **Sustituciones:** si falta el material de una estación, el plan usa una alternativa de `src/plans/hyrox-substitutions.json`, en orden de preferencia: primero una máquina parecida que el usuario tenga, y si no, un ejercicio sin material especial. Los burpees no necesitan material. El día de la carrera nunca hay sustituciones. Tabla y equivalencias provisionales.
+- **Running:** los planes de 5k, 10k y media maratón comparten las reglas generales y usan `src/plans/running-template.json` para lo que cambia por distancia: techos de volumen, peso de la tirada larga y longitud máxima de las series. Sin estaciones: la calidad son tempo en la base, y series más tempo después. La fuerza es una sesión semanal, dos con 5 días o más. Con fecha o en ciclos continuos, igual que HYROX.
+- **Distancia inalcanzable:** si la propia carrera supera lo que permite la regla de subida semanal respecto a la última semana normal, el generador rechaza el plan y explica por qué, en vez de saltarse la regla. Pasa con una media maratón para quien corre poco y tiene poco tiempo.
 - **Carga de fuerza:** se regula por RIR (repeticiones en reserva): el usuario elige el peso que le deja las repeticiones en reserva indicadas.
 - **Ajuste por registro:** si el usuario falla o marca RPE muy alto en varias sesiones seguidas, la semana siguiente baja carga. En la Fase 1 solo se muestra un aviso, cuando las 3 últimas sesiones registradas se han saltado, quedado a medias o marcado con RPE 9 o más. El ajuste automático llega después.
 
@@ -114,7 +116,7 @@ Cronometra los 16 tramos en orden (8 de carrera y 8 estaciones). La transición 
 - ¿Qué porcentajes de zona usamos definitivamente? → revisar con un entrenador o graduado en CAFD.
 - ¿Es adecuado el margen de +3 km por semana para quien parte de poco volumen? → revisar con un entrenador o graduado en CAFD.
 - ¿Qué porcentajes de distancia y peso usamos en cada fase para las estaciones? → revisar con un entrenador o graduado en CAFD.
-- ¿Son adecuados los techos de volumen por nivel (30, 45 y 60 km)? → revisar con un entrenador o graduado en CAFD.
+- ¿Son adecuados los techos de volumen por nivel (HYROX y 5k: 30, 45 y 60 km; 10k: 35, 50 y 65; media: 40, 55 y 70)? → revisar con un entrenador o graduado en CAFD.
 - ¿Qué reparto de tiempo usamos en la calculadora, y debe variar por categoría y nivel? → revisar con datos de resultados y con un entrenador.
 - ¿Son adecuadas las sustituciones de estaciones y sus equivalencias? → revisar con un entrenador o graduado en CAFD.
 - ¿Formato exacto de las plantillas de plan para que sea fácil contribuir?

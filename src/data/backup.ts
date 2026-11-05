@@ -40,7 +40,7 @@ const simulationSchema = z.strictObject({
 
 const activeSchema = z.object({
   planId: z.string().optional(),
-  athlete: z.looseObject({ level: z.string(), racer: z.string() }),
+  athlete: z.looseObject({ level: z.string() }),
   startDate: isoDate,
   plan: z.looseObject({
     goal: z.looseObject({ race: z.string() }),

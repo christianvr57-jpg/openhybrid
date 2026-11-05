@@ -81,6 +81,14 @@ export const en: Messages = {
   'sim.past': 'Past simulations',
   'sim.segments': '{count} segments',
 
+  'form.race': 'Goal',
+  'race.hyrox': 'HYROX',
+  'race.5k': '5 km',
+  'race.10k': '10 km',
+  'race.21k': 'Half marathon',
+  'error.race_too_long':
+    'With your current volume you cannot reach that distance in so little time. Pick a later date, a shorter distance or leave the date empty.',
+
   'form.title': 'Create your plan',
   'form.intro': 'A few questions and your plan is ready. Your answers never leave this device.',
   'form.goal': 'Your goal',
@@ -123,7 +131,6 @@ export const en: Messages = {
   'error.incomplete': 'Some answers are missing.',
   'error.invalid_mark_time': 'Write your result time as 45:00 or 1:45:00.',
   'error.invalid_hyrox_time': 'Write your HYROX time as 1:30:00.',
-  'error.unsupported_race': 'This race type is not available yet.',
   'error.unknown_division': 'Choose a division.',
   'error.division_racer_mismatch': 'That division does not match your choice.',
   'error.too_few_days': 'You need at least 3 free training days per week.',

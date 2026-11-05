@@ -79,6 +79,14 @@ export const es = {
   'sim.past': 'Simulacros anteriores',
   'sim.segments': '{count} tramos',
 
+  'form.race': 'Objetivo',
+  'race.hyrox': 'HYROX',
+  'race.5k': '5 km',
+  'race.10k': '10 km',
+  'race.21k': 'Media maratón',
+  'error.race_too_long':
+    'Con tu volumen actual no llegas a esa distancia en tan poco tiempo. Elige una fecha más lejana, una distancia menor o deja la fecha vacía.',
+
   'form.title': 'Crea tu plan',
   'form.intro': 'Unas preguntas y tendrás tu plan. Tus respuestas no salen de este dispositivo.',
   'form.goal': 'Tu objetivo',
@@ -121,7 +129,6 @@ export const es = {
   'error.incomplete': 'Faltan respuestas por completar.',
   'error.invalid_mark_time': 'Escribe el tiempo de tu marca como 45:00 o 1:45:00.',
   'error.invalid_hyrox_time': 'Escribe tu tiempo de HYROX como 1:30:00.',
-  'error.unsupported_race': 'Este tipo de carrera aún no está disponible.',
   'error.unknown_division': 'Elige una categoría.',
   'error.division_racer_mismatch': 'Esa categoría no corresponde a tu elección.',
   'error.too_few_days': 'Necesitas al menos 3 días libres de entrenamiento por semana.',

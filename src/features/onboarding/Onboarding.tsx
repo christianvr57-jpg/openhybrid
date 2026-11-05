@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { generatePlan, PlanInputError } from '../../engine/generate'
-import type { IsoDate, Level, Racer, StationId, Weekday } from '../../engine/model'
+import type { IsoDate, Level, RaceType, Racer, StationId, Weekday } from '../../engine/model'
 import type { MessageKey } from '../../i18n/es.ts'
 import { useI18n } from '../../i18n/index.tsx'
 import { hyroxDivisions } from '../../plans/hyrox-divisions'
@@ -16,6 +16,7 @@ const WEEKDAYS: Weekday[] = [
   'saturday',
   'sunday',
 ]
+const RACES: RaceType[] = ['hyrox', '5k', '10k', '21k']
 const LEVELS: Level[] = ['beginner', 'intermediate', 'advanced']
 const RACERS: Racer[] = ['women', 'men']
 const MARKS = [
@@ -49,6 +50,7 @@ export function Onboarding({
   const [form, setForm] = useState<OnboardingForm>(emptyForm)
   const [error, setError] = useState<MessageKey | null>(null)
 
+  const isHyrox = form.race === 'hyrox'
   const update = (changes: Partial<OnboardingForm>) => setForm({ ...form, ...changes })
   const divisions = hyroxDivisions.divisions.filter(
     (division) => form.racer !== '' && division.loadByRacer[form.racer] !== undefined,
@@ -77,38 +79,55 @@ export function Onboarding({
       <fieldset>
         <legend>{t('form.goal')}</legend>
         <label>
-          {t('form.racer')}
+          {t('form.race')}
           <select
-            required
-            value={form.racer}
-            onChange={(event) =>
-              update({ racer: event.target.value as Racer | '', divisionId: '' })
-            }
+            value={form.race}
+            onChange={(event) => update({ race: event.target.value as RaceType })}
           >
-            <option value="">{t('form.choose')}</option>
-            {RACERS.map((racer) => (
-              <option key={racer} value={racer}>
-                {t(`racer.${racer}`)}
+            {RACES.map((race) => (
+              <option key={race} value={race}>
+                {t(`race.${race}`)}
               </option>
             ))}
           </select>
         </label>
-        <label>
-          {t('form.division')}
-          <select
-            required
-            disabled={form.racer === ''}
-            value={form.divisionId}
-            onChange={(event) => update({ divisionId: event.target.value })}
-          >
-            <option value="">{t('form.choose')}</option>
-            {divisions.map((division) => (
-              <option key={division.id} value={division.id}>
-                {t(`division.${division.id}` as MessageKey)}
-              </option>
-            ))}
-          </select>
-        </label>
+        {isHyrox && (
+          <>
+            <label>
+              {t('form.racer')}
+              <select
+                required
+                value={form.racer}
+                onChange={(event) =>
+                  update({ racer: event.target.value as Racer | '', divisionId: '' })
+                }
+              >
+                <option value="">{t('form.choose')}</option>
+                {RACERS.map((racer) => (
+                  <option key={racer} value={racer}>
+                    {t(`racer.${racer}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              {t('form.division')}
+              <select
+                required
+                disabled={form.racer === ''}
+                value={form.divisionId}
+                onChange={(event) => update({ divisionId: event.target.value })}
+              >
+                <option value="">{t('form.choose')}</option>
+                {divisions.map((division) => (
+                  <option key={division.id} value={division.id}>
+                    {t(`division.${division.id}` as MessageKey)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
+        )}
         <label>
           {t('form.raceDate')}
           <input
@@ -177,17 +196,19 @@ export function Onboarding({
             />
           </label>
         )}
-        <label>
-          {t('form.hyroxTime')}
-          <input
-            type="text"
-            inputMode="numeric"
-            placeholder="1:30:00"
-            value={form.hyroxTime}
-            onChange={(event) => update({ hyroxTime: event.target.value })}
-          />
-          <small>{t('form.hyroxTimeHelp')}</small>
-        </label>
+        {isHyrox && (
+          <label>
+            {t('form.hyroxTime')}
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="1:30:00"
+              value={form.hyroxTime}
+              onChange={(event) => update({ hyroxTime: event.target.value })}
+            />
+            <small>{t('form.hyroxTimeHelp')}</small>
+          </label>
+        )}
       </fieldset>
 
       <fieldset>
@@ -265,22 +286,24 @@ export function Onboarding({
         </button>
       </fieldset>
 
-      <fieldset>
-        <legend>{t('form.equipment')}</legend>
-        <p className="meta">{t('form.equipmentHelp')}</p>
-        <div className="options">
-          {EQUIPMENT.map((id) => (
-            <label key={id}>
-              <input
-                type="checkbox"
-                checked={form.equipment.includes(id)}
-                onChange={() => update({ equipment: toggle(form.equipment, id) })}
-              />
-              {t(`station.${id}`)}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      {isHyrox && (
+        <fieldset>
+          <legend>{t('form.equipment')}</legend>
+          <p className="meta">{t('form.equipmentHelp')}</p>
+          <div className="options">
+            {EQUIPMENT.map((id) => (
+              <label key={id}>
+                <input
+                  type="checkbox"
+                  checked={form.equipment.includes(id)}
+                  onChange={() => update({ equipment: toggle(form.equipment, id) })}
+                />
+                {t(`station.${id}`)}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
 
       {error !== null && (
         <p className="notice" role="alert">

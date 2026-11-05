@@ -53,7 +53,8 @@ export interface FixedActivity {
 
 export interface Athlete {
   level: Level
-  racer: Racer
+  /** Sets the HYROX loads and wall ball target. Running plans do not need it. */
+  racer?: Racer
   /** Missing when the athlete has no mark: the plan starts with a test session. */
   mark?: RaceMark
   /** Only for comparing progress and targets. It never sets paces. */

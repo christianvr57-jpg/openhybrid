@@ -37,6 +37,8 @@ export function App() {
   const [storageFailed, setStorageFailed] = useState(false)
   const [tab, setTab] = useState<Tab>('today')
   const today = todayIso()
+  const isHyrox = active?.plan.goal.race === 'hyrox'
+  const tabs = TABS.filter((option) => option !== 'tools' || isHyrox)
 
   useEffect(() => {
     let cancelled = false
@@ -165,7 +167,7 @@ export function App() {
           <>
             {active !== null && (
               <nav className="tabs" aria-label={t('nav.label')}>
-                {TABS.map((option) => (
+                {tabs.map((option) => (
                   <button
                     key={option}
                     type="button"

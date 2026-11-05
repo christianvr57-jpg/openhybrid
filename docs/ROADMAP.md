@@ -36,7 +36,7 @@ HYROX es el producto principal. El running es secundario: se entrena como comple
 
 ## Fase 3 — Running como complemento
 
-- [ ] Planes de 5k, 10k y media maratón para los periodos sin competiciones oficiales
+- [x] Planes de 5k, 10k y media maratón para los periodos sin competiciones oficiales
 
 ## Fase 4 — Publicación
 

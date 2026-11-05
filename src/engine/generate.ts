@@ -1,6 +1,7 @@
 import { hyroxDivisions } from '../plans/hyrox-divisions'
 import { hyroxSubstitutions } from '../plans/hyrox-substitutions'
 import { hyroxTemplate as template } from '../plans/hyrox-template'
+import { runningTemplate } from '../plans/running-template'
 import type {
   Athlete,
   Block,
@@ -9,6 +10,7 @@ import type {
   Phase,
   Plan,
   PlanWarning,
+  RaceType,
   RunBlock,
   Session,
   SessionType,
@@ -18,10 +20,9 @@ import type {
   Weekday,
   Zone,
 } from './model'
-import { zonePace } from './paces'
+import { equivalentTimeSeconds, zonePace } from './paces'
 
 export type PlanInputErrorCode =
-  | 'unsupported_race'
   | 'unknown_division'
   | 'division_racer_mismatch'
   | 'too_few_days'
@@ -29,6 +30,7 @@ export type PlanInputErrorCode =
   | 'invalid_date'
   | 'race_too_soon'
   | 'race_too_far'
+  | 'race_too_long'
 
 export class PlanInputError extends Error {
   readonly code: PlanInputErrorCode
@@ -67,8 +69,30 @@ interface WeekSpec {
 
 type Loads = (typeof hyroxDivisions.loads)['light']
 
+/** What changes between race types. Everything else comes from the shared template. */
+interface RaceRules {
+  raceMeters: number
+  raceZone: Zone
+  volumeCapMeters: Record<Athlete['level'], number>
+  longRunShare: number
+  maxRepMeters: number
+}
+
+function rulesFor(race: RaceType): RaceRules {
+  return race === 'hyrox'
+    ? {
+        raceMeters: hyroxDivisions.run.segments * hyroxDivisions.run.segmentMeters,
+        raceZone: 'z4',
+        volumeCapMeters: template.volumeCapMeters,
+        longRunShare: template.longRunShare,
+        maxRepMeters: 1000,
+      }
+    : runningTemplate[race]
+}
+
 const DAY_MS = 86_400_000
 const TEST_METERS = 3000
+const MIN_EASY_METERS = 2000
 const DEFAULT_PACE = 390
 const STATION_SECONDS = 180
 const STRENGTH_SET_SECONDS = 150
@@ -172,11 +196,11 @@ function roundTo(value: number, step: number): number {
   return Math.max(step, Math.round(value / step) * step)
 }
 
-function volumeCap(athlete: Athlete): number {
+function volumeCap(athlete: Athlete, rules: RaceRules): number {
   const fixedDays = athlete.fixedActivities.map((activity) => activity.weekday)
   const trainingDays = athlete.availableDays.filter((day) => !fixedDays.includes(day)).length
   const cap = Math.min(
-    template.volumeCapMeters[athlete.level],
+    rules.volumeCapMeters[athlete.level],
     trainingDays * template.volumeCapPerTrainingDayMeters,
   )
   return Math.max(cap, athlete.weeklyRunMeters)
@@ -212,6 +236,7 @@ function isDeloadIndex(index: number): boolean {
 
 function datedSpecs(
   athlete: Athlete,
+  rules: RaceRules,
   firstMonday: number,
   raceTime: number,
 ): { specs: WeekSpec[]; trainingWeeks: number } {
@@ -227,7 +252,7 @@ function datedSpecs(
   const taperWeeks = totalWeeks >= template.longTaperMinWeeks ? 2 : 1
   const trainingWeeks = totalWeeks - taperWeeks
   const allocation = phaseAllocation(trainingWeeks, athlete)
-  const cap = volumeCap(athlete)
+  const cap = volumeCap(athlete, rules)
   const specificEnd = trainingWeeks - 1
   const lastSteps = template.stationSteps.length - 1
 
@@ -274,8 +299,8 @@ function datedSpecs(
   return { specs, trainingWeeks }
 }
 
-function continuousSpecs(athlete: Athlete, firstMonday: number): WeekSpec[] {
-  const cap = volumeCap(athlete)
+function continuousSpecs(athlete: Athlete, rules: RaceRules, firstMonday: number): WeekSpec[] {
+  const cap = volumeCap(athlete, rules)
   const specs: WeekSpec[] = []
   let normal = floorTo(Math.max(athlete.weeklyRunMeters, template.minWeeklyRunMeters), 100)
   for (let index = 0; index < template.continuousWeeks; index += 1) {
@@ -300,7 +325,12 @@ function continuousSpecs(athlete: Athlete, firstMonday: number): WeekSpec[] {
   return specs
 }
 
-function plannedSessions(spec: WeekSpec, athlete: Athlete, trainingDays: number): PlannedSession[] {
+function plannedSessions(
+  spec: WeekSpec,
+  athlete: Athlete,
+  trainingDays: number,
+  isHyrox: boolean,
+): PlannedSession[] {
   const needsTest = athlete.mark === undefined && spec.number === 1
   const qualityType = (): SessionType => {
     if (needsTest) {
@@ -312,6 +342,9 @@ function plannedSessions(spec: WeekSpec, athlete: Athlete, trainingDays: number)
     if (spec.phase === 'base') {
       return 'tempo'
     }
+    if (!isHyrox) {
+      return 'intervals'
+    }
     if (spec.phase === 'build') {
       return 'stations'
     }
@@ -320,7 +353,8 @@ function plannedSessions(spec: WeekSpec, athlete: Athlete, trainingDays: number)
 
   const hasSecondQuality =
     trainingDays >= 4 && !spec.isDeload && (spec.phase === 'build' || spec.phase === 'specific')
-  const hasSecondStrength = !spec.isDeload && spec.phase !== 'taper'
+  const hasSecondStrength =
+    !spec.isDeload && spec.phase !== 'taper' && (isHyrox || trainingDays >= 5)
 
   const planned: PlannedSession[] = [
     { role: 'long', type: 'long_run' },
@@ -328,17 +362,17 @@ function plannedSessions(spec: WeekSpec, athlete: Athlete, trainingDays: number)
     { role: 'strength_heavy', type: 'strength' },
     { role: 'easy', type: 'easy_run' },
   ]
-  if (spec.phase === 'base') {
+  if (isHyrox && spec.phase === 'base') {
     planned.push({ role: 'technique', type: 'stations' })
   }
   if (hasSecondQuality) {
-    planned.push({ role: 'quality_b', type: 'intervals' })
-  }
-  if (hasSecondStrength) {
-    planned.push({ role: 'strength_general', type: 'strength' })
+    planned.push({ role: 'quality_b', type: isHyrox ? 'intervals' : 'tempo' })
   }
   if (trainingDays >= 5) {
     planned.push({ role: 'easy', type: 'easy_run' })
+  }
+  if (hasSecondStrength) {
+    planned.push({ role: 'strength_general', type: 'strength' })
   }
   return planned
 }
@@ -535,10 +569,17 @@ function runBlock(athlete: Athlete, meters: number, zone: Zone, repeats = 1): Ru
   return athlete.mark === undefined ? block : { ...block, pace: zonePace(athlete.mark, zone) }
 }
 
-function intervalBlocks(athlete: Athlete, meters: number): Block[] {
-  const repMeters = meters >= 4000 ? 1000 : meters >= 1600 ? 800 : 400
+function intervalBlocks(athlete: Athlete, meters: number, maxRepMeters: number): Block[] {
+  const options = [
+    { repMeters: 2000, minMeters: 8000 },
+    { repMeters: 1000, minMeters: 4000 },
+    { repMeters: 800, minMeters: 1600 },
+  ]
+  const repMeters =
+    options.find((item) => item.repMeters <= maxRepMeters && meters >= item.minMeters)?.repMeters ??
+    400
   const repeats = Math.max(1, Math.floor(meters / repMeters))
-  const zone: Zone = repMeters === 1000 ? 'z4' : 'z5'
+  const zone: Zone = repMeters >= 1000 ? 'z4' : 'z5'
   return [{ ...runBlock(athlete, repMeters, zone, repeats), recovery: { meters: repMeters / 2 } }]
 }
 
@@ -605,40 +646,50 @@ function qualityBlocks(
   meters: number,
   spec: WeekSpec,
   athlete: Athlete,
-  loads: Loads,
+  rules: RaceRules,
+  loads: Loads | null,
 ): Block[] {
+  if (item.type === 'test') {
+    return withWarmup([runBlock(athlete, TEST_METERS, 'z5')])
+  }
+  if (item.type === 'tempo') {
+    return withWarmup([runBlock(athlete, Math.max(200, floorTo(meters, 100)), 'z3')])
+  }
+  if (loads === null || item.type === 'intervals') {
+    return withWarmup(intervalBlocks(athlete, meters, rules.maxRepMeters))
+  }
   const step = template.stationSteps[spec.stationStep] ?? { distance: 1, load: 1 }
   const stationCount = spec.isDeload ? 2 : 4
   const stations = rotatingStations(spec.number, stationCount)
-  switch (item.type) {
-    case 'test':
-      return withWarmup([runBlock(athlete, TEST_METERS, 'z5')])
-    case 'tempo':
-      return withWarmup([runBlock(athlete, Math.max(200, floorTo(meters, 100)), 'z3')])
-    case 'stations':
-      return withWarmup(combinedBlocks(athlete, meters, stations, step, loads, 'z2'))
-    case 'compromised_run':
-      return withWarmup(combinedBlocks(athlete, meters, stations, step, loads, 'z3'))
-    case 'simulation':
-      return withWarmup(combinedBlocks(athlete, meters, stations, step, loads, 'z4'))
-    default:
-      return withWarmup(intervalBlocks(athlete, meters))
-  }
+  const zone: Zone =
+    item.type === 'simulation' ? 'z4' : item.type === 'compromised_run' ? 'z3' : 'z2'
+  return withWarmup(combinedBlocks(athlete, meters, stations, step, loads, zone))
 }
 
-function buildWeek(spec: WeekSpec, input: PlanInput, loads: Loads, days: Weekday[]): Week {
+function buildWeek(
+  spec: WeekSpec,
+  input: PlanInput,
+  rules: RaceRules,
+  loads: Loads | null,
+  days: Weekday[],
+): Week {
   const { athlete } = input
   const fixedDays = athlete.fixedActivities.map((activity) => activity.weekday)
-  const planned = plannedSessions(spec, athlete, days.length)
+  const planned = plannedSessions(spec, athlete, days.length, loads !== null)
   const layout = layoutWeek(planned, days, fixedDays, spec.avoidHardOn)
   const placed = WEEKDAYS.flatMap((day) => (layout.get(day) ?? []).map((item) => ({ day, item })))
 
   const qualities = placed.filter(
     ({ item }) => item.role === 'quality_a' || item.role === 'quality_b',
   )
-  const qualityMeters = (spec.targetMeters * template.qualityShare) / Math.max(1, qualities.length)
+  // Lighter weeks drop a quality session, but the one left must not grow to fill its place.
+  const qualitySessions = spec.isDeload || spec.phase === 'taper' ? 2 : qualities.length
+  const qualityMeters = (spec.targetMeters * template.qualityShare) / Math.max(1, qualitySessions)
   const blocksOf = new Map<PlannedSession, Block[]>(
-    qualities.map(({ item }) => [item, qualityBlocks(item, qualityMeters, spec, athlete, loads)]),
+    qualities.map(({ item }) => [
+      item,
+      qualityBlocks(item, qualityMeters, spec, athlete, rules, loads),
+    ]),
   )
 
   const usedMeters = [...blocksOf.values()].reduce(
@@ -649,10 +700,7 @@ function buildWeek(spec: WeekSpec, input: PlanInput, loads: Loads, days: Weekday
   const long = placed.find(({ item }) => item.role === 'long')
   const easy = placed.filter(({ item }) => item.role === 'easy')
 
-  const longShare = Math.max(
-    spec.targetMeters * template.longRunShare,
-    remaining / (1 + easy.length),
-  )
+  const longShare = Math.max(spec.targetMeters * rules.longRunShare, remaining / (1 + easy.length))
   const longMeters =
     long === undefined
       ? 0
@@ -684,7 +732,7 @@ function buildWeek(spec: WeekSpec, input: PlanInput, loads: Loads, days: Weekday
         ),
       ]
     }
-    if (item.role === 'technique') {
+    if (item.role === 'technique' && loads !== null) {
       const step = template.stationSteps[spec.stationStep] ?? { distance: 1, load: 1 }
       const stations = rotatingStations(spec.number, spec.isDeload ? 2 : 4)
       return [
@@ -727,34 +775,65 @@ function partialWeek(startTime: number, athlete: Athlete, days: readonly Weekday
   }
 }
 
+function hyroxRaceBlocks(loads: Loads): Block[] {
+  const fullStep = { distance: 1, load: 1 }
+  return hyroxDivisions.stations.flatMap((station): Block[] => [
+    { kind: 'run', repeats: 1, meters: hyroxDivisions.run.segmentMeters, zone: 'z4' },
+    stationBlock(station.id, fullStep, loads),
+  ])
+}
+
+function runningRaceBlocks(athlete: Athlete, rules: RaceRules): Block[] {
+  const block: RunBlock = {
+    kind: 'run',
+    repeats: 1,
+    meters: rules.raceMeters,
+    zone: rules.raceZone,
+  }
+  if (athlete.mark === undefined) {
+    return [block]
+  }
+  const pace = equivalentTimeSeconds(athlete.mark, rules.raceMeters) / (rules.raceMeters / 1000)
+  return [{ ...block, pace: { fastest: pace * 0.99, slowest: pace * 1.01 } }]
+}
+
+/** Largest volume the race week may reach under the weekly rise rule. */
+function raceWeekLimit(lastNormalMeters: number): number {
+  return (
+    lastNormalMeters +
+    Math.max(lastNormalMeters * template.weeklyIncreaseFraction, template.weeklyIncreaseMeters)
+  )
+}
+
 function raceWeek(
   number: number,
   raceTime: number,
   peakMeters: number,
+  lastNormalMeters: number,
   input: PlanInput,
-  loads: Loads,
+  rules: RaceRules,
+  loads: Loads | null,
   days: readonly Weekday[],
 ): Week {
   const { athlete } = input
   const raceDay = weekdayIndex(raceTime)
-  const fullStep = { distance: 1, load: 1 }
   const race = toSession(
     'race',
     weekdayAt(raceDay),
-    hyroxDivisions.stations.flatMap((station): Block[] => [
-      { kind: 'run', repeats: 1, meters: hyroxDivisions.run.segmentMeters, zone: 'z4' },
-      stationBlock(station.id, fullStep, loads),
-    ]),
+    loads === null ? runningRaceBlocks(athlete, rules) : hyroxRaceBlocks(loads),
   )
 
-  const raceMeters = hyroxDivisions.run.segments * hyroxDivisions.run.segmentMeters
   const easyMeters = floorTo(
-    Math.min(peakMeters * template.raceWeekFactor - raceMeters, template.raceWeekEasyMaxMeters),
+    Math.min(
+      peakMeters * template.raceWeekFactor - rules.raceMeters,
+      raceWeekLimit(lastNormalMeters) - rules.raceMeters,
+      template.raceWeekEasyMaxMeters,
+    ),
     100,
   )
   const easyDay = WEEKDAYS.slice(0, Math.max(0, raceDay - 1)).find((day) => days.includes(day))
   const sessions =
-    easyMeters > 0 && easyDay !== undefined
+    easyMeters >= MIN_EASY_METERS && easyDay !== undefined
       ? [toSession('easy_run', easyDay, [runBlock(athlete, easyMeters, 'z2')]), race]
       : [race]
 
@@ -774,23 +853,21 @@ function resolveLoads(athlete: Athlete, goal: Goal): Loads {
   if (division === undefined) {
     throw new PlanInputError('unknown_division')
   }
-  const tier = division.loadByRacer[athlete.racer]
+  const tier = athlete.racer === undefined ? undefined : division.loadByRacer[athlete.racer]
   if (tier === undefined) {
     throw new PlanInputError('division_racer_mismatch')
   }
   return hyroxDivisions.loads[tier]
 }
 
-/** Builds a HYROX plan: dated towards a race, or continuous cycles with no date. */
+/** Builds a plan for HYROX or a running race: dated, or continuous cycles with no date. */
 export function generatePlan(input: PlanInput): Plan {
   const { athlete, goal, startDate } = input
-  if (goal.race !== 'hyrox') {
-    throw new PlanInputError('unsupported_race')
-  }
   if (!(athlete.weeklyRunMeters >= 0)) {
     throw new PlanInputError('invalid_volume')
   }
-  const loads = resolveLoads(athlete, goal)
+  const rules = rulesFor(goal.race)
+  const loads = goal.race === 'hyrox' ? resolveLoads(athlete, goal) : null
   const fixedDays = athlete.fixedActivities.map((activity) => activity.weekday)
   const days = WEEKDAYS.filter(
     (day) => athlete.availableDays.includes(day) && !fixedDays.includes(day),
@@ -807,20 +884,26 @@ export function generatePlan(input: PlanInput): Plan {
   const warnings: PlanWarning[] = []
 
   if (goal.date === undefined) {
-    const specs = continuousSpecs(athlete, firstMonday)
-    weeks.push(...specs.map((spec) => buildWeek(spec, input, loads, days)))
+    const specs = continuousSpecs(athlete, rules, firstMonday)
+    weeks.push(...specs.map((spec) => buildWeek(spec, input, rules, loads, days)))
     return { goal, weeks, warnings }
   }
 
   const raceTime = parseDate(goal.date)
-  const { specs, trainingWeeks } = datedSpecs(athlete, firstMonday, raceTime)
+  const { specs, trainingWeeks } = datedSpecs(athlete, rules, firstMonday, raceTime)
+  const lastNormalMeters = specs.filter((spec) => !spec.isDeload).at(-1)?.targetMeters ?? 0
+  if (rules.raceMeters > raceWeekLimit(lastNormalMeters)) {
+    throw new PlanInputError('race_too_long')
+  }
   if (athlete.level === 'beginner' && trainingWeeks < template.shortPlanTrainingWeeks) {
     warnings.push('short_timeline')
   }
-  weeks.push(...specs.map((spec) => buildWeek(spec, input, loads, days)))
+  weeks.push(...specs.map((spec) => buildWeek(spec, input, rules, loads, days)))
 
   const peakMeters = Math.max(...specs.map((spec) => spec.targetMeters))
   const lastNumber = specs.at(-1)?.number ?? 0
-  weeks.push(raceWeek(lastNumber + 1, raceTime, peakMeters, input, loads, days))
+  weeks.push(
+    raceWeek(lastNumber + 1, raceTime, peakMeters, lastNormalMeters, input, rules, loads, days),
+  )
   return { goal, weeks, warnings }
 }

@@ -14,7 +14,6 @@ const PRINCIPLES = [
   'principle.deload',
   'principle.intensity',
   'principle.hardDays',
-  'principle.stations',
 ] as const
 
 function WeekDetails({
@@ -145,6 +144,7 @@ export function PlanView({
   return (
     <section className="screen">
       <h2>{t('plan.title')}</h2>
+      <p className="meta">{t(`race.${plan.goal.race}`)}</p>
       {plan.goal.date === undefined && <p className="meta">{t('plan.continuous')}</p>}
 
       {plan.warnings.map((warning) => (
@@ -172,6 +172,7 @@ export function PlanView({
         {PRINCIPLES.map((key) => (
           <li key={key}>{t(key)}</li>
         ))}
+        {plan.goal.race === 'hyrox' && <li>{t('principle.stations')}</li>}
       </ul>
       <p className="meta">{t('principle.provisional')}</p>
 

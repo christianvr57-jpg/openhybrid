@@ -71,7 +71,7 @@ Regla clave: **`src/engine` no importa nada de la interfaz.** Debe poder ejecuta
 
 ## Estado actual
 
-Fases 0 (cimientos), 1 (MVP de HYROX) y 2 (herramientas de HYROX) cerradas. La app se publica en <https://christianvr57-jpg.github.io/openhybrid/> con cada subida a `main`, si pasan lint, typecheck y tests. Siguiente paso: Fase 3 (running como complemento): planes de 5k, 10k y media maratón. Ver `docs/ROADMAP.md` y actualiza esta sección al cerrar cada fase.
+Fases 0 (cimientos), 1 (MVP de HYROX), 2 (herramientas de HYROX) y 3 (running como complemento) cerradas. La app se publica en <https://christianvr57-jpg.github.io/openhybrid/> con cada subida a `main`, si pasan lint, typecheck y tests. Siguiente paso: Fase 4 (publicación): revisión profesional de las plantillas, guía para contribuir, web con demo y app nativa. Ver `docs/ROADMAP.md` y actualiza esta sección al cerrar cada fase.
 
 Decisiones técnicas de la Fase 0:
 

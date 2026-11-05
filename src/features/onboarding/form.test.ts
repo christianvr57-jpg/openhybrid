@@ -46,6 +46,23 @@ describe('toPlanInput', () => {
     expect(input.athlete.hyroxTimeSeconds).toBe(5400)
   })
 
+  it('does not ask running plans for HYROX answers', () => {
+    const input = toPlanInput(
+      {
+        ...emptyForm,
+        race: '10k',
+        level: 'beginner',
+        weeklyKm: '15',
+        hyroxTime: 'ignored',
+        days: ['monday', 'wednesday', 'saturday'],
+      },
+      '2026-11-09',
+    )
+    expect(input.goal).toEqual({ race: '10k' })
+    expect(input.athlete.racer).toBeUndefined()
+    expect(input.athlete.hyroxTimeSeconds).toBeUndefined()
+  })
+
   it('ignores fixed activities with no name', () => {
     const input = toPlanInput(
       {

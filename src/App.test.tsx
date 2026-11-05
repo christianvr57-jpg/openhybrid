@@ -240,6 +240,24 @@ describe('App', () => {
     })
   })
 
+  it('creates a running plan without HYROX questions or tools', async () => {
+    renderApp()
+    await screen.findByText(/Consulta con un profesional/)
+    choose('Objetivo', '10k')
+    expect(screen.queryByLabelText('Compito en', { exact: false })).toBeNull()
+    expect(screen.queryByText('Material al que tienes acceso')).toBeNull()
+    choose('Nivel', 'beginner')
+    choose('Kilómetros', '15')
+    for (const day of ['Martes', 'Jueves', 'Domingo']) {
+      fireEvent.click(screen.getByLabelText(day))
+    }
+    fireEvent.click(screen.getByRole('button', { name: 'Crear mi plan' }))
+
+    expect(await screen.findByRole('heading', { name: 'Hoy' })).toBeTruthy()
+    expect(vi.mocked(saveActivePlan).mock.calls[0]?.[0].plan.goal).toEqual({ race: '10k' })
+    expect(screen.queryByRole('button', { name: 'Herramientas' })).toBeNull()
+  })
+
   it('explains why a plan cannot be created', async () => {
     renderApp()
     await screen.findByText(/Consulta con un profesional/)

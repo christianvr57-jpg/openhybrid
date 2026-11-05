@@ -1,5 +1,5 @@
 import type { PlanInput } from '../../engine/generate'
-import type { IsoDate, Level, Racer, StationId, Weekday } from '../../engine/model'
+import type { IsoDate, Level, RaceType, Racer, StationId, Weekday } from '../../engine/model'
 
 export interface FixedActivityField {
   name: string
@@ -7,6 +7,7 @@ export interface FixedActivityField {
 }
 
 export interface OnboardingForm {
+  race: RaceType
   racer: Racer | ''
   divisionId: string
   raceDate: string
@@ -21,6 +22,7 @@ export interface OnboardingForm {
 }
 
 export const emptyForm: OnboardingForm = {
+  race: 'hyrox',
   racer: '',
   divisionId: '',
   raceDate: '',
@@ -71,7 +73,12 @@ function requiredTime(text: string, code: FormErrorCode): number {
 /** Turns the questionnaire answers into the input of the plan generator. */
 export function toPlanInput(form: OnboardingForm, today: IsoDate): PlanInput {
   const weeklyKm = Number(form.weeklyKm.replace(',', '.'))
-  if (form.racer === '' || form.level === '' || form.divisionId === '' || form.weeklyKm === '') {
+  const isHyrox = form.race === 'hyrox'
+  if (
+    form.level === '' ||
+    form.weeklyKm === '' ||
+    (isHyrox && (form.racer === '' || form.divisionId === ''))
+  ) {
     throw new FormError('incomplete')
   }
 
@@ -85,14 +92,14 @@ export function toPlanInput(form: OnboardingForm, today: IsoDate): PlanInput {
           },
         }
   const hyroxTime =
-    form.hyroxTime.trim() === ''
+    !isHyrox || form.hyroxTime.trim() === ''
       ? {}
       : { hyroxTimeSeconds: requiredTime(form.hyroxTime, 'invalid_hyrox_time') }
 
   return {
     athlete: {
       level: form.level,
-      racer: form.racer,
+      ...(isHyrox && form.racer !== '' ? { racer: form.racer } : {}),
       ...mark,
       ...hyroxTime,
       weeklyRunMeters: weeklyKm * 1000,
@@ -100,11 +107,11 @@ export function toPlanInput(form: OnboardingForm, today: IsoDate): PlanInput {
       fixedActivities: form.fixedActivities
         .map((activity) => ({ ...activity, name: activity.name.trim() }))
         .filter((activity) => activity.name !== ''),
-      equipment: form.equipment,
+      equipment: isHyrox ? form.equipment : [],
     },
     goal: {
-      race: 'hyrox',
-      divisionId: form.divisionId,
+      race: form.race,
+      ...(isHyrox ? { divisionId: form.divisionId } : {}),
       ...(form.raceDate === '' ? {} : { date: form.raceDate }),
     },
     startDate: today,

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { generatePlan, isHardSession, PlanInputError } from './generate'
 import type { PlanInput } from './generate'
-import type { Athlete, Block, Plan, Session, StationId, Weekday, Week } from './model'
+import type { Athlete, Block, Plan, RaceType, Session, StationId, Weekday, Week } from './model'
 
 const ALL_STATIONS: StationId[] = [
   'ski_erg',
@@ -247,6 +247,152 @@ describe.each(Object.entries(athletes))('plan for %s', (_, athlete) => {
   })
 })
 
+const RUNNING_RACES: { race: RaceType; meters: number; maxRep: number }[] = [
+  { race: '5k', meters: 5000, maxRep: 800 },
+  { race: '10k', meters: 10_000, maxRep: 1000 },
+  { race: '21k', meters: 21_100, maxRep: 2000 },
+]
+
+function runningInput(athlete: Athlete, race: RaceType, date?: string): PlanInput {
+  return {
+    athlete,
+    goal: date === undefined ? { race } : { race, date },
+    startDate: '2026-11-09',
+  }
+}
+
+const blocksOf = (plan: Plan): Block[] =>
+  plan.weeks.flatMap((week) => week.sessions).flatMap((session) => session.blocks)
+
+describe.each(RUNNING_RACES)('$race plan', ({ race, meters, maxRep }) => {
+  describe.each(Object.entries(athletes))('for %s', (_, athlete) => {
+    const dated = generatePlan(runningInput(athlete, race, '2027-03-13'))
+    const continuous = generatePlan(runningInput(athlete, race))
+
+    it('never raises running volume beyond the limit', () => {
+      expectSaneVolume(dated)
+      expectSaneVolume(continuous)
+    })
+
+    it('includes deload weeks and ends with a taper and the race', () => {
+      expect(dated.weeks.some((week) => week.isDeload)).toBe(true)
+      expect(dated.weeks.at(-2)?.phase).toBe('taper')
+      const finish = dated.weeks.at(-1)?.sessions.at(-1)
+      expect(finish?.type).toBe('race')
+      expect(finish?.blocks).toHaveLength(1)
+      expect(finish?.blocks[0]).toMatchObject({ kind: 'run', meters })
+    })
+
+    it('never puts two hard days in a row', () => {
+      const days = hardDayNumbers(dated, athlete)
+      for (const [index, day] of days.entries()) {
+        const previous = days[index - 1]
+        if (previous !== undefined) {
+          expect(day - previous).toBeGreaterThan(1)
+        }
+      }
+    })
+
+    it('has no HYROX stations', () => {
+      expect(blocksOf(dated).some((block) => block.kind === 'station')).toBe(false)
+      expect(blocksOf(continuous).some((block) => block.kind === 'station')).toBe(false)
+    })
+
+    it('keeps most running easy', () => {
+      for (const week of fullWeeks(dated).filter(
+        (item) => item.phase !== 'taper' && item.number > 1 && item.runMeters >= 10_000,
+      )) {
+        const quality = week.sessions.reduce((total, session) => total + qualityMeters(session), 0)
+        expect(quality / week.runMeters).toBeLessThanOrEqual(0.25)
+      }
+    })
+
+    it('keeps the long run from dominating the week', () => {
+      for (const week of fullWeeks(continuous)) {
+        const long = week.sessions.find((session) => session.type === 'long_run')
+        const longMeters = long?.blocks.reduce(
+          (total, block) => (block.kind === 'run' ? total + block.meters : total),
+          0,
+        )
+        expect((longMeters ?? 0) / week.runMeters).toBeLessThanOrEqual(0.5)
+      }
+    })
+
+    it('trains strength every week before the taper', () => {
+      for (const week of fullWeeks(dated).filter((item) => item.phase !== 'taper')) {
+        expect(week.sessions.some((session) => session.type === 'strength')).toBe(true)
+      }
+    })
+
+    it('makes intervals lighter in deload and taper weeks', () => {
+      const intervalMeters = (week: Week): number =>
+        week.sessions
+          .filter((session) => session.type === 'intervals')
+          .reduce((total, session) => total + qualityMeters(session), 0)
+      for (const [index, week] of dated.weeks.entries()) {
+        const previous = dated.weeks[index - 1]
+        const isLighter = week.isDeload || (week.phase === 'taper' && previous?.phase !== 'taper')
+        if (isLighter && previous !== undefined && intervalMeters(previous) > 0) {
+          expect(intervalMeters(week)).toBeLessThanOrEqual(intervalMeters(previous))
+        }
+      }
+    })
+
+    it('spreads running over the available days', () => {
+      if (athlete.availableDays.length >= 5) {
+        for (const week of fullWeeks(continuous).filter((item) => !item.isDeload)) {
+          const runs = week.sessions.filter((session) => session.type === 'easy_run')
+          expect(runs.length).toBeGreaterThanOrEqual(2)
+        }
+      }
+    })
+
+    it('keeps intervals within the distance of the race', () => {
+      const reps = blocksOf(dated).filter((block) => block.kind === 'run' && block.repeats > 1)
+      for (const block of reps) {
+        expect(block.kind === 'run' && block.meters).toBeLessThanOrEqual(maxRep)
+      }
+    })
+  })
+})
+
+describe('running plans', () => {
+  it('gives a race pace from the mark', () => {
+    const plan = generatePlan(runningInput(base, '10k', '2027-03-13'))
+    const finish = plan.weeks.at(-1)?.sessions.at(-1)?.blocks[0]
+    expect(finish).toMatchObject({ pace: { fastest: 297, slowest: 303 } })
+  })
+
+  it('combines intervals and tempo when there is time', () => {
+    const athlete: Athlete = {
+      ...base,
+      availableDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'saturday', 'sunday'],
+    }
+    const plan = generatePlan(runningInput(athlete, '10k', '2027-03-13'))
+    const types = plan.weeks
+      .filter((week) => week.phase === 'specific' && !week.isDeload)
+      .flatMap((week) => week.sessions.map((session) => session.type))
+    expect(types).toContain('intervals')
+    expect(types).toContain('tempo')
+  })
+
+  it('does not need a division or a category', () => {
+    const athlete = { ...base }
+    delete athlete.racer
+    expect(() => generatePlan(runningInput(athlete, '5k'))).not.toThrow()
+  })
+
+  it('refuses a half marathon the athlete cannot reach in time', () => {
+    const athlete = { ...base, level: 'beginner' as const, weeklyRunMeters: 3000 }
+    expect(() => generatePlan(runningInput(athlete, '21k', '2026-12-19'))).toThrow('race_too_long')
+  })
+
+  it('still reaches the half marathon with more time', () => {
+    const athlete = { ...base, level: 'beginner' as const, weeklyRunMeters: 3000 }
+    expect(() => generatePlan(runningInput(athlete, '21k', '2027-03-13'))).not.toThrow()
+  })
+})
+
 describe('dated plan structure', () => {
   const plan = generatePlan(inputFor(base, '2027-03-13'))
 
@@ -454,10 +600,6 @@ describe('invalid input', () => {
     expect(codeOf({ ...input, goal: { race: 'hyrox', divisionId: 'singles_men' } })).toBe(
       'division_racer_mismatch',
     )
-  })
-
-  it('rejects race types that are not ready yet', () => {
-    expect(codeOf({ ...inputFor(base), goal: { race: '10k' } })).toBe('unsupported_race')
   })
 
   it('rejects invalid dates and volumes', () => {
