@@ -77,7 +77,7 @@ Decisiones técnicas de la Fase 0:
 
 - TypeScript se queda en 6.0 porque `typescript-eslint` aún no admite la 7. Subirlo cuando lo admita.
 - i18n propio en `src/i18n/` (sin librería): con dos idiomas no compensa una dependencia.
-- Dexie, Zustand y Zod se instalan en la Fase 1, cuando haya código que los use.
+- Dexie y Zod se instalaron en la Fase 1. Zustand no se instala por ahora: con pocas pantallas basta el estado de React.
 - Los iconos PNG se generan con `node scripts/generate-icons.mjs`.
 - ESLint impide que `src/engine` importe la interfaz o use APIs del navegador.
 - GitHub Pages sirve la app bajo `/openhybrid/`: la ruta llega por la variable `BASE_PATH`. En local sigue siendo la raíz.

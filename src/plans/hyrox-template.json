@@ -35,7 +35,7 @@
     "general": [
       { "exercise": "bench_press", "sets": 3, "reps": 8, "rir": 2 },
       { "exercise": "barbell_row", "sets": 3, "reps": 8, "rir": 2 },
-      { "exercise": "plank", "sets": 3, "reps": 1, "rir": 2 }
+      { "exercise": "overhead_press", "sets": 3, "reps": 8, "rir": 2 }
     ]
   }
 }
