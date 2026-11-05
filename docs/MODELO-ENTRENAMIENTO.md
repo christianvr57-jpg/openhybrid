@@ -54,7 +54,7 @@ La marca fija los ritmos. El tiempo objetivo nunca los cambia: solo se compara c
 | Z4 | Series largas (1–2 km) | −2 % a +2 % |
 | Z5 | Series cortas (200–800 m) | −8 % a −3 % |
 
-Estos porcentajes son provisionales y deben revisarse con un entrenador. Viven en un archivo de configuración, no repartidos por el código.
+Estos porcentajes son provisionales y deben revisarse con un entrenador. Viven en un archivo de configuración (`src/engine/config.ts`), no repartidos por el código. Para prescribir Z1 se usa +30 % a +40 %; un ritmo registrado más lento sigue siendo Z1.
 
 Las zonas tienen huecos a propósito: esos ritmos no se prescriben. Solo para clasificar lo registrado, cada hueco se reparte entre sus dos zonas por el punto medio (p. ej. entre Z2 y Z3, el límite es +12,5 %).
 
@@ -95,7 +95,7 @@ Formato estándar: 8 tramos de 1 km de carrera, cada uno seguido de una estació
 
 Entre carrera y estación está la ROXZONE (zona de transición), que también cuenta en el tiempo.
 
-**Pendiente de verificar contra el reglamento oficial de la temporada vigente:** distancias exactas, cargas por categoría (Open, Pro, Doubles, Relay; hombre/mujer) y altura del objetivo de wall balls. Todo esto vive en un archivo de datos (`src/plans/hyrox-divisions.json`), nunca en el código.
+Distancias, cargas por categoría (Individual, Doubles y Relay; Open y Pro; hombre y mujer) y altura del objetivo de wall balls viven en `src/plans/hyrox-divisions.json`, nunca en el código. Verificados contra los reglamentos oficiales de la temporada 2026/27 el 5 de noviembre de 2026. Hay que revisarlos al empezar cada temporada. La categoría Adaptive queda fuera por ahora: tiene reglamento propio y no se ha revisado.
 
 ### Calculadora de parciales (fase 2)
 
