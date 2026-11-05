@@ -1,0 +1,66 @@
+{
+  "season": "2026/27",
+  "verifiedOn": "2026-11-05",
+  "sources": [
+    "https://maintain.hyrox.com/rulebooks/HYROX_RulebookSingles_EN.pdf",
+    "https://maintain.hyrox.com/rulebooks/HYROX_RulebookDoubles_EN.pdf",
+    "https://maintain.hyrox.com/rulebooks/HYROX_RulebookRelay_EN.pdf"
+  ],
+  "run": { "segments": 8, "segmentMeters": 1000 },
+  "stations": [
+    { "id": "ski_erg", "work": { "kind": "distance", "meters": 1000 } },
+    { "id": "sled_push", "work": { "kind": "distance", "meters": 50 } },
+    { "id": "sled_pull", "work": { "kind": "distance", "meters": 50 } },
+    { "id": "burpee_broad_jumps", "work": { "kind": "distance", "meters": 80 } },
+    { "id": "rowing", "work": { "kind": "distance", "meters": 1000 } },
+    { "id": "farmers_carry", "work": { "kind": "distance", "meters": 200 } },
+    { "id": "sandbag_lunges", "work": { "kind": "distance", "meters": 100 } },
+    { "id": "wall_balls", "work": { "kind": "reps", "reps": 100 } }
+  ],
+  "loads": {
+    "light": {
+      "sledPushKg": 102,
+      "sledPullKg": 78,
+      "farmersCarryKgPerHand": 16,
+      "sandbagLungesKg": 10,
+      "wallBallKg": 4
+    },
+    "medium": {
+      "sledPushKg": 152,
+      "sledPullKg": 103,
+      "farmersCarryKgPerHand": 24,
+      "sandbagLungesKg": 20,
+      "wallBallKg": 6
+    },
+    "heavy": {
+      "sledPushKg": 202,
+      "sledPullKg": 153,
+      "farmersCarryKgPerHand": 32,
+      "sandbagLungesKg": 30,
+      "wallBallKg": 9
+    }
+  },
+  "wallBallTargetMeters": { "women": 2.7, "men": 3 },
+  "divisions": [
+    { "id": "singles_women", "format": "singles", "loadByRacer": { "women": "light" } },
+    { "id": "singles_women_pro", "format": "singles", "loadByRacer": { "women": "medium" } },
+    { "id": "singles_men", "format": "singles", "loadByRacer": { "men": "medium" } },
+    { "id": "singles_men_pro", "format": "singles", "loadByRacer": { "men": "heavy" } },
+    { "id": "doubles_women", "format": "doubles", "loadByRacer": { "women": "light" } },
+    { "id": "doubles_women_pro", "format": "doubles", "loadByRacer": { "women": "medium" } },
+    { "id": "doubles_men", "format": "doubles", "loadByRacer": { "men": "medium" } },
+    { "id": "doubles_men_pro", "format": "doubles", "loadByRacer": { "men": "heavy" } },
+    {
+      "id": "doubles_mixed",
+      "format": "doubles",
+      "loadByRacer": { "women": "medium", "men": "medium" }
+    },
+    { "id": "relay_women", "format": "relay", "loadByRacer": { "women": "light" } },
+    { "id": "relay_men", "format": "relay", "loadByRacer": { "men": "medium" } },
+    {
+      "id": "relay_mixed",
+      "format": "relay",
+      "loadByRacer": { "women": "light", "men": "medium" }
+    }
+  ]
+}
