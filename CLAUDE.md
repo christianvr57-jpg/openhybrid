@@ -59,7 +59,7 @@ Regla clave: **`src/engine` no importa nada de la interfaz.** Debe poder ejecuta
 ## Calidad
 
 - Todo cambio en `src/engine` lleva tests.
-- Tests de "cordura" del generador: ningún plan puede subir el volumen semanal de carrera más del mayor de 10 % o +3 km respecto a la última semana normal (sin contar las de descarga), debe incluir semanas de descarga, y debe terminar en una puesta a punto antes de la carrera. Si un test así falla, el plan está mal, no el test.
+- Tests de "cordura" del generador: ningún plan puede subir el volumen semanal de carrera más del mayor de 10 % o +3 km respecto a la última semana normal (sin contar las de descarga), debe incluir semanas de descarga, y, si tiene fecha de carrera, debe terminar en una puesta a punto antes de ella. Si un test así falla, el plan está mal, no el test.
 - `npm run lint`, `npm run typecheck` y `npm test` deben pasar antes de dar algo por terminado.
 
 ## Legal

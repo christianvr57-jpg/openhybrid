@@ -5,10 +5,10 @@ Este documento define el dominio antes de escribir código. Es un **borrador par
 ## 1. Entidades
 
 ```
-Athlete      Datos del usuario: nivel, marca de referencia, volumen semanal actual de carrera, días disponibles, actividades fijas, material.
+Athlete      Datos del usuario: nivel, marca de referencia, tiempo de HYROX opcional, volumen semanal actual de carrera, días disponibles, actividades fijas, material.
 FixedActivity  Otro deporte con día fijo (p. ej. pádel): nombre y día de la semana. Cuenta como día duro.
-Goal         Carrera objetivo: tipo (5k | 10k | 21k | hyrox), fecha, categoría HYROX si aplica, tiempo objetivo opcional.
-Plan         Resultado del generador: lista de semanas desde hoy hasta la carrera.
+Goal         Carrera objetivo: tipo (5k | 10k | 21k | hyrox), fecha opcional, categoría HYROX si aplica, tiempo objetivo opcional.
+Plan         Resultado del generador: lista de semanas desde hoy hasta la carrera o, sin fecha, ciclos continuos.
 Phase        Base | Construcción | Específica | Puesta a punto (taper).
 Week         Número, fase, si es de descarga, volumen objetivo, sesiones.
 Session      Un entreno: tipo, bloques, duración estimada, intensidad. Un día puede tener varias sesiones (p. ej. fuerza y carrera).
@@ -60,9 +60,12 @@ Las zonas tienen huecos a propósito: esos ritmos no se prescriben. Solo para cl
 
 Sin marca: estimar desde una sesión `test` que la app propone en la primera semana. Hasta tener el resultado, las sesiones se prescriben por sensaciones (RPE), sin ritmos.
 
+Un tiempo de HYROX no sirve como marca: mezcla carrera, estaciones y transiciones, y sus kilómetros se corren ya cansado. Se guarda solo para comparar el progreso y el tiempo objetivo.
+
 ## 3. Reglas del generador
 
 - **Periodización** hacia atrás desde la fecha de la carrera: puesta a punto (1–2 semanas), específica, construcción, base. Si hay poco tiempo, se recorta primero la base, salvo a principiantes: a ellos no se les recorta y la app avisa de que el plazo es corto.
+- **Sin fecha de carrera:** el plan avanza en ciclos continuos de 4 semanas (3 de carga y 1 de descarga), con fases de base y construcción, sin fase específica ni puesta a punto. Al añadir una fecha, el plan se recalcula hacia atrás desde ella. Esto sirve también para los bloques de running entre competiciones.
 - **Volumen:** el plan parte del volumen semanal actual del usuario. La subida semanal de carrera no supera el mayor de estos dos valores: 10 % o +3 km (provisional). Se compara siempre con la última semana normal, no con una de descarga. Cada 3–4 semanas, una semana de descarga (−20 a −30 %).
 - **Semana parcial:** si el plan empieza a mitad de semana, esos días son suaves y no cuentan para el volumen. La primera semana completa empieza el lunes siguiente.
 - **Distribución de intensidad:** la mayor parte del volumen de carrera (≈ 80 %) en Z1–Z2; el resto de calidad.
@@ -71,6 +74,8 @@ Sin marca: estimar desde una sesión `test` que la app propone en la primera sem
 - **Prioridad si no cabe todo:** tirada larga, primera sesión de calidad, primera sesión de fuerza, rodaje, segunda sesión de calidad.
 - **Fuerza:** mínimo 1–2 sesiones por semana en todos los planes (en HYROX, más). No poner fuerza pesada de pierna el día antes de series.
 - **HYROX:** desde la fase de construcción, al menos una sesión semanal combinada (carrera + estaciones). Carreras comprometidas en la fase específica. Uno o dos simulacros parciales antes de la puesta a punto.
+- **Carga de estaciones:** progresa por fases como porcentaje de lo oficial en la categoría del usuario (distancia o repeticiones, y peso), p. ej. del 50 % al 100 %. En cada paso sube una sola variable. Los porcentajes son provisionales y viven en datos, no en el código.
+- **Carga de fuerza:** se regula por RIR (repeticiones en reserva): el usuario elige el peso que le deja las repeticiones en reserva indicadas.
 - **Ajuste por registro:** si el usuario falla o marca RPE muy alto en varias sesiones seguidas, la semana siguiente baja carga. (Fase 1 puede limitarse a mostrarlo; el ajuste automático puede venir después.)
 
 ## 4. HYROX: formato de carrera
@@ -101,9 +106,8 @@ Entrada: tiempo objetivo total y categoría. Salida: ritmo por cada km de carrer
 - ¿Qué porcentajes de zona usamos definitivamente? → revisar con un entrenador o graduado en CAFD.
 - ¿Es adecuado el margen de +3 km por semana para quien parte de poco volumen? → revisar con un entrenador o graduado en CAFD.
 - Si un principiante tiene poco tiempo y no se le recorta la base, ¿qué fase se acorta?
-- ¿Cómo funciona un plan sin carrera con fecha (quien aún no tiene inscripción, o un bloque de running entre competiciones)? Hoy todo el plan se calcula hacia atrás desde la fecha.
-- ¿Cómo se mide y progresa la carga de estaciones y fuerza? La regla del 10 % solo cubre la carrera.
-- ¿Puede servir un tiempo de HYROX como marca de referencia? Hoy los ritmos solo salen de una marca de carrera a pie.
+- ¿Qué porcentajes de distancia y peso usamos en cada fase para las estaciones? → revisar con un entrenador o graduado en CAFD.
+- En ciclos continuos, ¿hasta dónde sube el volumen? Sin fecha de carrera, la regla del 10 % o +3 km no tiene final y hace falta un techo.
 - ¿Cómo sustituimos estaciones si el usuario no tiene trineo, SkiErg o remo? (tabla de sustituciones por material)
 - ¿Cuántas semanas mínimas y máximas admite un plan? (propuesta: 6–24)
 - ¿Formato exacto de las plantillas de plan para que sea fácil contribuir?
