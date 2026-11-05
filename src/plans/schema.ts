@@ -113,3 +113,25 @@ export const hyroxTemplateSchema = z.strictObject({
 })
 
 export type HyroxTemplate = z.infer<typeof hyroxTemplateSchema>
+
+const substitution = z.strictObject({
+  exercise: z.string().min(1),
+  /** Station whose equipment this option needs. Missing means no special equipment. */
+  requires: z.enum(stationIds).optional(),
+  unit: z.enum(['meters', 'reps']),
+  /** Amount of the substitute for each official meter or repetition. */
+  perOfficial: z.number().positive(),
+  keepLoad: z.boolean(),
+})
+
+export const hyroxSubstitutionsSchema = z.partialRecord(
+  z.enum(stationIds),
+  z
+    .array(substitution)
+    .min(1)
+    .refine((options) => options.at(-1)?.requires === undefined, {
+      message: 'The last option must not need special equipment',
+    }),
+)
+
+export type HyroxSubstitutions = z.infer<typeof hyroxSubstitutionsSchema>

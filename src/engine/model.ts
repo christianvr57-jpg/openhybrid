@@ -105,6 +105,8 @@ export interface StationBlock {
   reps?: number
   /** Reference load. Farmers carry is per hand. */
   loadKg?: number
+  /** Exercise id used instead of the station when the equipment is missing. */
+  substitute?: string
 }
 
 export interface StrengthBlock {

@@ -78,6 +78,7 @@ Un tiempo de HYROX no sirve como marca: mezcla carrera, estaciones y transicione
 - **Carga de estaciones:** progresa por fases como porcentaje de lo oficial en la categoría del usuario (distancia o repeticiones, y peso), p. ej. del 50 % al 100 %. En cada paso sube una sola variable. Los porcentajes son provisionales y viven en datos, no en el código.
 - **Valores iniciales del generador:** viven en `src/plans/hyrox-template.json` y son provisionales. Fases ideales de 6 semanas de base, 6 de construcción y 4 específicas; descarga de −25 % cada 4 semanas; puesta a punto de 2 semanas (1 si el plan dura menos de 8). Las estaciones pasan por cinco pasos, de 50 % de distancia y 60 % de peso hasta el 100 % de ambos.
 - **Prioridad en HYROX:** la sesión combinada ocupa el lugar de la primera sesión de calidad desde la fase de construcción. Con 4 días o menos, la fuerza de pierna se junta con otra sesión dura para dejar sitio al rodaje.
+- **Sustituciones:** si falta el material de una estación, el plan usa una alternativa de `src/plans/hyrox-substitutions.json`, en orden de preferencia: primero una máquina parecida que el usuario tenga, y si no, un ejercicio sin material especial. Los burpees no necesitan material. El día de la carrera nunca hay sustituciones. Tabla y equivalencias provisionales.
 - **Carga de fuerza:** se regula por RIR (repeticiones en reserva): el usuario elige el peso que le deja las repeticiones en reserva indicadas.
 - **Ajuste por registro:** si el usuario falla o marca RPE muy alto en varias sesiones seguidas, la semana siguiente baja carga. (Fase 1 puede limitarse a mostrarlo; el ajuste automático puede venir después.)
 
@@ -110,5 +111,5 @@ Entrada: tiempo objetivo total y categoría. Salida: ritmo por cada km de carrer
 - ¿Es adecuado el margen de +3 km por semana para quien parte de poco volumen? → revisar con un entrenador o graduado en CAFD.
 - ¿Qué porcentajes de distancia y peso usamos en cada fase para las estaciones? → revisar con un entrenador o graduado en CAFD.
 - ¿Son adecuados los techos de volumen por nivel (30, 45 y 60 km)? → revisar con un entrenador o graduado en CAFD.
-- ¿Cómo sustituimos estaciones si el usuario no tiene trineo, SkiErg o remo? (tabla de sustituciones por material)
+- ¿Son adecuadas las sustituciones de estaciones y sus equivalencias? → revisar con un entrenador o graduado en CAFD.
 - ¿Formato exacto de las plantillas de plan para que sea fácil contribuir?

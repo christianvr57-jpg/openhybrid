@@ -21,7 +21,7 @@ HYROX es el producto principal. El running es secundario: se entrena como comple
 - [x] `src/engine/model.ts`: tipos del dominio según `docs/MODELO-ENTRENAMIENTO.md`
 - [x] `src/engine/paces.ts`: Riegel + zonas, con tests
 - [x] `src/engine/generate.ts`: plan de HYROX por fases (fuerza + carrera + estaciones + carreras comprometidas + simulacros) y ciclos continuos sin fecha, con tests de cordura
-- [ ] Sustituciones de estaciones según material disponible
+- [x] Sustituciones de estaciones según material disponible
 - [ ] Cuestionario de inicio (objetivo, fecha opcional, categoría, marca, tiempo de HYROX opcional, volumen actual, días, actividades fijas, material) + aviso de salud
 - [ ] Pantalla "Hoy": sesión del día con ritmos y cargas concretos
 - [ ] Vista del plan completo por semanas

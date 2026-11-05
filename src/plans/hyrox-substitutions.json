@@ -1,0 +1,33 @@
+{
+  "ski_erg": [
+    {
+      "exercise": "rowing",
+      "requires": "rowing",
+      "unit": "meters",
+      "perOfficial": 1,
+      "keepLoad": false
+    },
+    { "exercise": "band_pull_down", "unit": "reps", "perOfficial": 0.06, "keepLoad": false }
+  ],
+  "sled_push": [
+    { "exercise": "bear_crawl", "unit": "meters", "perOfficial": 1, "keepLoad": false }
+  ],
+  "sled_pull": [{ "exercise": "band_row", "unit": "reps", "perOfficial": 1, "keepLoad": false }],
+  "rowing": [
+    {
+      "exercise": "ski_erg",
+      "requires": "ski_erg",
+      "unit": "meters",
+      "perOfficial": 1,
+      "keepLoad": false
+    },
+    { "exercise": "band_row", "unit": "reps", "perOfficial": 0.06, "keepLoad": false }
+  ],
+  "farmers_carry": [
+    { "exercise": "backpack_carry", "unit": "meters", "perOfficial": 1, "keepLoad": true }
+  ],
+  "sandbag_lunges": [
+    { "exercise": "backpack_lunge", "unit": "meters", "perOfficial": 1, "keepLoad": true }
+  ],
+  "wall_balls": [{ "exercise": "squat_press", "unit": "reps", "perOfficial": 1, "keepLoad": true }]
+}

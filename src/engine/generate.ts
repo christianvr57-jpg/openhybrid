@@ -1,4 +1,5 @@
 import { hyroxDivisions } from '../plans/hyrox-divisions'
+import { hyroxSubstitutions } from '../plans/hyrox-substitutions'
 import { hyroxTemplate as template } from '../plans/hyrox-template'
 import type {
   Athlete,
@@ -496,6 +497,33 @@ function stationBlock(
   return { ...block, loadKg: roundTo(scaled, scaled >= 10 ? 2 : 1) }
 }
 
+/** Station block for training: swaps the station when the athlete lacks the equipment. */
+function trainingStationBlock(
+  athlete: Athlete,
+  id: StationId,
+  step: { distance: number; load: number },
+  loads: Loads,
+): StationBlock {
+  const block = stationBlock(id, step, loads)
+  const option = hyroxSubstitutions[id]?.find(
+    (item) => item.requires === undefined || athlete.equipment.includes(item.requires),
+  )
+  if (athlete.equipment.includes(id) || option === undefined) {
+    return block
+  }
+  const amount = roundTo((block.meters ?? block.reps ?? 0) * option.perOfficial, 5)
+  const substituted: StationBlock = {
+    kind: 'station',
+    station: id,
+    repeats: block.repeats,
+    substitute: option.exercise,
+    ...(option.unit === 'meters' ? { meters: amount } : { reps: amount }),
+  }
+  return option.keepLoad && block.loadKg !== undefined
+    ? { ...substituted, loadKg: block.loadKg }
+    : substituted
+}
+
 function rotatingStations(weekNumber: number, count: number): StationId[] {
   const all = hyroxDivisions.stations.map((station) => station.id)
   const start = (weekNumber * count) % all.length
@@ -523,7 +551,10 @@ function combinedBlocks(
   zone: Zone,
 ): Block[] {
   const segment = Math.min(1000, Math.max(200, floorTo(meters / stations.length, 100)))
-  return stations.flatMap((id) => [runBlock(athlete, segment, zone), stationBlock(id, step, loads)])
+  return stations.flatMap((id) => [
+    runBlock(athlete, segment, zone),
+    trainingStationBlock(athlete, id, step, loads),
+  ])
 }
 
 function withWarmup(blocks: Block[]): Block[] {
@@ -657,7 +688,11 @@ function buildWeek(spec: WeekSpec, input: PlanInput, loads: Loads, days: Weekday
       const step = template.stationSteps[spec.stationStep] ?? { distance: 1, load: 1 }
       const stations = rotatingStations(spec.number, spec.isDeload ? 2 : 4)
       return [
-        toSession('stations', day, withWarmup(stations.map((id) => stationBlock(id, step, loads)))),
+        toSession(
+          'stations',
+          day,
+          withWarmup(stations.map((id) => trainingStationBlock(athlete, id, step, loads))),
+        ),
       ]
     }
     const blocks = blocksOf.get(item)

@@ -308,6 +308,57 @@ describe('dated plan structure', () => {
   })
 })
 
+describe('station substitutions', () => {
+  const stationBlocks = (plan: Plan, skipRace = true) =>
+    plan.weeks
+      .flatMap((week) => week.sessions)
+      .filter((session) => !skipRace || session.type !== 'race')
+      .flatMap((session) => session.blocks)
+      .filter((block) => block.kind === 'station')
+
+  it('keeps real stations when the athlete has the equipment', () => {
+    const plan = generatePlan(inputFor(base, '2027-03-13'))
+    expect(stationBlocks(plan).some((block) => block.substitute !== undefined)).toBe(false)
+  })
+
+  it('replaces every station that needs equipment when there is none', () => {
+    const plan = generatePlan(inputFor({ ...base, equipment: [] }, '2027-03-13'))
+    const blocks = stationBlocks(plan)
+    expect(blocks.length).toBeGreaterThan(0)
+    for (const block of blocks) {
+      expect(block.substitute !== undefined).toBe(block.station !== 'burpee_broad_jumps')
+    }
+  })
+
+  it('prefers a similar machine the athlete has', () => {
+    const plan = generatePlan(inputFor({ ...base, equipment: ['rowing'] }, '2027-03-13'))
+    const ski = stationBlocks(plan).filter((block) => block.station === 'ski_erg')
+    expect(ski.length).toBeGreaterThan(0)
+    expect(ski.every((block) => block.substitute === 'rowing')).toBe(true)
+  })
+
+  it('converts the amount and drops loads that no longer apply', () => {
+    const plan = generatePlan(inputFor({ ...base, equipment: [] }, '2027-03-13'))
+    const blocks = stationBlocks(plan)
+    const ski = blocks.find((block) => block.station === 'ski_erg')
+    const sled = blocks.find((block) => block.station === 'sled_push')
+    const lunges = blocks.find((block) => block.station === 'sandbag_lunges')
+    expect(ski?.substitute).toBe('band_pull_down')
+    expect(ski?.reps).toBeGreaterThanOrEqual(30)
+    expect(ski?.meters).toBeUndefined()
+    expect(sled?.loadKg).toBeUndefined()
+    expect(lunges?.loadKg).toBeDefined()
+  })
+
+  it('never substitutes on race day', () => {
+    const plan = generatePlan(inputFor({ ...base, equipment: [] }, '2027-03-13'))
+    const race = plan.weeks.at(-1)?.sessions.at(-1)
+    const blocks = race?.blocks.filter((block) => block.kind === 'station') ?? []
+    expect(blocks).toHaveLength(8)
+    expect(blocks.some((block) => block.substitute !== undefined)).toBe(false)
+  })
+})
+
 describe('athletes without a mark', () => {
   const plan = generatePlan(inputFor({ ...base, mark: undefined }, '2027-03-13'))
 
