@@ -80,6 +80,7 @@ Decisiones técnicas de la Fase 0:
 - Dexie y Zod se instalaron en la Fase 1. Zustand no se instala por ahora: con pocas pantallas basta el estado de React.
 - Los iconos PNG se generan con `node scripts/generate-icons.mjs`.
 - ESLint impide que `src/engine` importe la interfaz o use APIs del navegador.
+- Estilo visual: negro y amarillo de competición, solo en modo oscuro, con títulos en Barlow Condensed incluida en la app (sin Google Fonts). Es una inspiración: nunca el logo, el nombre ni la tipografía de HYROX.
 - GitHub Pages sirve la app bajo `/openhybrid/`: la ruta llega por la variable `BASE_PATH`. En local sigue siendo la raíz.
 
 ## Sobre el autor

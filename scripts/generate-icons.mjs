@@ -4,9 +4,9 @@
 import { writeFileSync } from 'node:fs'
 import { crc32, deflateSync } from 'node:zlib'
 
-const BACKGROUND = [0x14, 0x34, 0x2b]
-const RING = [0xf6, 0xf7, 0xf4]
-const DOT = [0xf2, 0xc1, 0x4e]
+const BACKGROUND = [0x0b, 0x0b, 0x0c]
+const RING = [0xf6, 0xf6, 0xf3]
+const DOT = [0xff, 0xe2, 0x00]
 
 // Artwork coordinates, in a 512-unit square.
 const CENTER = 256
